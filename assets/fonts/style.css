@@ -1,0 +1,15 @@
+@font-face {
+   font-family: 'ProximaNova-Extrabld';
+   font-display: swap;
+   src: url('ProximaNova-Extrabld/font.ttf');
+}
+@font-face {
+   font-family: 'ProximaNova-Bold';
+   font-display: swap;
+   src: url('ProximaNova-Bold/font.ttf');
+}
+@font-face {
+   font-family: 'ProximaNova-Regular';
+   font-display: swap;
+   src: url('ProximaNova-Regular/font.ttf');
+}
