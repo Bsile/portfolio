@@ -1,6 +1,7 @@
-#remove html file extension https://basiler.fr/page.html
-# to https://basiler.fr/page
 RewriteEngine On
+
 RewriteCond %{REQUEST_FILENAME} !-d
+
 RewriteCond %{REQUEST_FILENAME} !-f
+
 RewriteRule ^([^\.]+)$ $1.html [NC, L]
