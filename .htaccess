@@ -1,8 +1,9 @@
-RewriteEngine on 
- 
- 
-RewriteCond %{THE_REQUEST} /([^.]+)\.html [NC] 
-RewriteRule ^ /%1 [NC,L,R] 
- 
-RewriteCond %{REQUEST_FILENAME}.html -f 
-RewriteRule ^ %{REQUEST_URI}.html [NC,L] 
+#example.com/page will display the contents of example.com/page.html
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.+)$ $1.html [L,QSA]
+
+#301 from example.com/page.html to example.com/page
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /.*\.html\ HTTP/
+RewriteRule ^(.*)\.html$ /$1 [R=301,L]
