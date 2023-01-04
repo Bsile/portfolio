@@ -89,7 +89,15 @@ Je créé et joue avec des formes, en gros.">
 
 <section data-bs-version="5.1" class="gallery3 cid-toSeMUCaS4" id="Work">
     
-
+  <script>
+// set a short timeout before taking action
+// so as to allow hash to be set
+setTimeout(()=>{
+  // uses HTML5 history API to manipulate the location bar
+  history.replaceState('', document.title, window.location.origin + window.location.pathname + window.location.search);
+}, 5); // 5 millisecond timeout in this case
+</script>
+  
 <script>
 
 function reveal() {
@@ -111,7 +119,6 @@ function reveal() {
 window.addEventListener("scroll", reveal);
 
 </script>
-
     
     <div class="container">
         
