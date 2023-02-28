@@ -13,3 +13,8 @@
    font-display: swap;
    src: url('ProximaNova-Regular/font.ttf');
 }
+@font-face {
+   font-family: 'Montserrat-Black';
+   font-display: swap;
+   src: url('Montserrat-Black/font.ttf');
+}
