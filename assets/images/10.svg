@@ -50,7 +50,7 @@
 
       .cls-11 {
         fill: #fff;
-        font-family: Montserrat-Black, Montserrat;
+        font-family: Montserrat-Black, Montserrat-Black;
         font-size: 48px;
       }
 
