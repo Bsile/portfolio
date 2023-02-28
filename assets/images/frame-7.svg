@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Frame_7" data-name="Frame 7" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Dégradé_sans_nom_4-3);
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #fff;
+        stroke-miterlimit: 10;
+        stroke-width: 2px;
+      }
+
+      .cls-3 {
+        fill: url(#Dégradé_sans_nom_8);
+      }
+
+      .cls-4 {
+        fill: url(#Dégradé_sans_nom_4);
+      }
+
+      .cls-5 {
+        fill: #191c26;
+      }
+
+      .cls-6 {
+        letter-spacing: 0em;
+      }
+
+      .cls-7 {
+        fill: url(#Dégradé_sans_nom_4-2);
+      }
+
+      .cls-8 {
+        fill: #fff;
+        font-family: Montserrat-Black, Montserrat;
+        font-size: 110px;
+      }
+    </style>
+    <linearGradient id="Dégradé_sans_nom_8" data-name="Dégradé sans nom 8" x1="-49.61" y1="1095.85" x2="1952.89" y2="-6.65" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16163c"/>
+      <stop offset="1" stop-color="#7237bd"/>
+    </linearGradient>
+    <linearGradient id="Dégradé_sans_nom_4" data-name="Dégradé sans nom 4" x1="1575.08" y1="964.05" x2="1737.08" y2="797.55" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7237bd"/>
+      <stop offset="1" stop-color="#fd0988"/>
+    </linearGradient>
+    <linearGradient id="Dégradé_sans_nom_4-2" data-name="Dégradé sans nom 4" x1="321.41" y1="306.12" x2="156.48" y2="481.87" xlink:href="#Dégradé_sans_nom_4"/>
+    <linearGradient id="Dégradé_sans_nom_4-3" data-name="Dégradé sans nom 4" x1="1771.26" y1="435.74" x2="1639.61" y2="576.02" xlink:href="#Dégradé_sans_nom_4"/>
+  </defs>
+  <rect class="cls-3" width="1920" height="1080"/>
+  <path class="cls-2" d="M420.29,1110.38c-138-130.63-228.63-310.79-243.41-512.04"/>
+  <path class="cls-2" d="M1252.14-189.11c198.67,79.68,357.21,238.19,436.92,436.84"/>
+  <text class="cls-8" transform="translate(512.52 513.62)"><tspan x="0" y="0">NOUS SOMMES</tspan><tspan x="61.38" y="132">UNE </tspan><tspan class="cls-6" x="343.09" y="132">A</tspan><tspan x="430.65" y="132">GENCE</tspan></text>
+  <circle class="cls-5" cx="216.53" cy="68.03" r="142.28"/>
+  <circle class="cls-4" cx="1663.16" cy="873.53" r="71.14"/>
+  <polygon class="cls-7" points="238.91 343.9 309.8 323.14 289.03 394.03 309.8 464.92 238.91 444.16 168.02 464.92 188.78 394.03 168.02 323.14 238.91 343.9"/>
+  <polygon class="cls-1" points="1702.8 393.78 1620.65 536.06 1784.94 536.06 1702.8 393.78"/>
+</svg>

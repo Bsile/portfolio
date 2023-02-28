@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Frame_19" data-name="Frame 19" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 11px;
+      }
+
+      .cls-2, .cls-3 {
+        stroke-miterlimit: 10;
+      }
+
+      .cls-3 {
+        fill: url(#Dégradé_sans_nom_9);
+        stroke: #1d1d1b;
+      }
+
+      .cls-4 {
+        fill: #fd0988;
+      }
+
+      .cls-5 {
+        fill: red;
+      }
+    </style>
+    <linearGradient id="Dégradé_sans_nom_9" data-name="Dégradé sans nom 9" x1="-7336.22" y1="1076.12" x2="-5415.7" y2="5.51" gradientTransform="translate(7334.41 1079.63) scale(1 -1)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16163c"/>
+      <stop offset=".17" stop-color="#19153d"/>
+      <stop offset=".31" stop-color="#231540"/>
+      <stop offset=".43" stop-color="#341445"/>
+      <stop offset=".55" stop-color="#4b124d"/>
+      <stop offset=".66" stop-color="#6a1157"/>
+      <stop offset=".77" stop-color="#900f64"/>
+      <stop offset=".87" stop-color="#bd0c73"/>
+      <stop offset=".98" stop-color="#ef0983"/>
+      <stop offset="1" stop-color="#fd0988"/>
+    </linearGradient>
+  </defs>
+  <rect class="cls-3" x=".25" y="-.19" width="1920" height="1080" transform="translate(1920.5 1079.63) rotate(-180)"/>
+  <line class="cls-2" x1="1920.25" y1="872.96" x2=".25" y2="872.96"/>
+  <circle class="cls-4" cx="445.05" cy="482.36" r="46.66"/>
+  <polygon class="cls-1" points="376.7 564.11 322.82 657.43 430.58 657.43 376.7 564.11"/>
+  <rect class="cls-1" x="470.78" y="288.95" width="93.32" height="93.32"/>
+  <polygon class="cls-1" points="184.57 504.4 231.23 490.73 217.56 537.39 231.23 584.05 184.57 570.39 137.91 584.05 151.57 537.39 137.91 490.73 184.57 504.4"/>
+  <rect class="cls-1" x="672.04" y="402.71" width="65.99" height="65.99" transform="translate(-101.59 626.15) rotate(-45)"/>
+  <path class="cls-5" d="M529.37,560.98c22.03-8.19,46.75-4.26,67.54,5.67,21.71,10.36,39.83,26.59,57.08,43.06,17.62,16.83,34.91,34.11,50.44,52.93,15.42,18.69,29,39.02,38.81,61.23,9.7,21.98,15.65,45.9,15.45,70.01-.02,2.95-.14,5.9-.35,8.85-.09,1.35,1.22,2.5,2.5,2.5,1.43,0,2.41-1.15,2.5-2.5,1.71-24.72-3.11-49.57-12.1-72.55-9.07-23.18-22.23-44.38-37.54-63.94-15.37-19.63-32.82-37.52-50.72-54.82-17.48-16.89-35.48-33.91-56.94-45.69-20.94-11.5-45.96-17.7-69.63-12.11-2.84,.67-5.63,1.53-8.36,2.54-1.26,.47-2.13,1.69-1.75,3.08,.33,1.22,1.8,2.22,3.08,1.75h0Z"/>
+  <path class="cls-5" d="M703.77,784.08c17.44,9.2,33.53,20.84,47.69,34.57,4.01,3.89,7.86,7.95,11.55,12.15,1.01,1.15,3.25,.9,3.93-.51,6.99-14.6,10.93-30.54,11.48-46.72,.15-4.58,.02-9.17-.38-13.74-.12-1.35-1.06-2.5-2.5-2.5-1.26,0-2.62,1.15-2.5,2.5,1.35,15.47-.5,31.09-5.47,45.8-1.4,4.14-3.05,8.19-4.94,12.13l3.93-.51c-13.23-15.07-28.63-28.23-45.56-38.99-4.78-3.04-9.68-5.87-14.69-8.51-2.84-1.5-5.37,2.81-2.52,4.32h0Z"/>
+</svg>

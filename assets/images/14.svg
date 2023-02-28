@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Frame_14" data-name="Frame 14" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #7237bd;
+      }
+
+      .cls-2 {
+        fill: url(#Dégradé_sans_nom_2);
+      }
+
+      .cls-3 {
+        fill: #6262c5;
+      }
+
+      .cls-4 {
+        fill: url(#Dégradé_sans_nom_5);
+      }
+
+      .cls-4, .cls-5, .cls-6, .cls-7 {
+        stroke-miterlimit: 10;
+      }
+
+      .cls-4, .cls-7 {
+        stroke: #1d1d1b;
+      }
+
+      .cls-5, .cls-6, .cls-8 {
+        fill: none;
+      }
+
+      .cls-5, .cls-8 {
+        stroke: #fff;
+        stroke-width: 2px;
+      }
+
+      .cls-6 {
+        stroke: #6262c5;
+        stroke-width: 8px;
+      }
+
+      .cls-9 {
+        letter-spacing: 0em;
+      }
+
+      .cls-8 {
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .cls-10 {
+        fill: #fd0988;
+      }
+
+      .cls-11 {
+        fill: #191c26;
+      }
+
+      .cls-7 {
+        fill: url(#Dégradé_sans_nom_4);
+      }
+
+      .cls-12 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-13 {
+        fill: #fff;
+        font-family: Montserrat-Black, Montserrat;
+        font-size: 24px;
+      }
+
+      .cls-14 {
+        fill: red;
+      }
+    </style>
+    <linearGradient id="Dégradé_sans_nom_4" data-name="Dégradé sans nom 4" x1="960" y1="1080" x2="960" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16163c"/>
+      <stop offset="1" stop-color="#7237bd"/>
+    </linearGradient>
+    <linearGradient id="Dégradé_sans_nom_2" data-name="Dégradé sans nom 2" x1="1500.56" y1="113.47" x2="1583.36" y2="131.64" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7237bd"/>
+      <stop offset="1" stop-color="#fff"/>
+    </linearGradient>
+    <linearGradient id="Dégradé_sans_nom_5" data-name="Dégradé sans nom 5" x1="1458.08" y1="1018.06" x2="1512.08" y2="961.53" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16163c"/>
+      <stop offset="1" stop-color="#7237bd"/>
+    </linearGradient>
+  </defs>
+  <rect class="cls-7" y="0" width="1920" height="1080"/>
+  <rect class="cls-6" x="-85.54" y="149.4" width="1388.81" height="781.21"/>
+  <rect class="cls-6" x="-85.54" y="149.4" width="1388.81" height="390.6"/>
+  <rect class="cls-6" x="-7.04" y="612.71" width="584.8" height="243"/>
+  <rect class="cls-6" x="639.97" y="612.71" width="584.8" height="243"/>
+  <rect class="cls-6" x="-46.17" y="187.46" width="57.96" height="57.96"/>
+  <rect class="cls-6" x="2.85" y="105.33" width="19.32" height="19.32"/>
+  <rect class="cls-6" x="1033.55" y="187.46" width="231.82" height="57.96"/>
+  <rect class="cls-11" x="1379.23" y="0" width="540.77" height="1080"/>
+  <circle class="cls-10" cx="1526.28" cy="962.87" r="31.11"/>
+  <polygon class="cls-1" points="1459.93 120.39 1486.13 135.52 1486.13 105.26 1459.93 120.39"/>
+  <polygon class="cls-1" points="1615.07 120.39 1588.86 105.26 1588.86 135.52 1615.07 120.39"/>
+  <g>
+    <g>
+      <path class="cls-2" d="M1500.26,120.7c0-5.16,3.96-8.78,9.36-8.78,3.29,0,5.88,1.2,7.54,3.36l-3.58,3.19c-.98-1.25-2.16-1.97-3.67-1.97-2.35,0-3.94,1.63-3.94,4.2s1.58,4.2,3.94,4.2c1.51,0,2.69-.72,3.67-1.97l3.58,3.19c-1.66,2.16-4.25,3.36-7.54,3.36-5.4,0-9.36-3.62-9.36-8.79Z"/>
+      <path class="cls-2" d="M1517.75,120.7c0-5.09,4.01-8.78,9.48-8.78s9.48,3.7,9.48,8.78-4.01,8.79-9.48,8.79-9.48-3.7-9.48-8.79Zm13.25,0c0-2.62-1.68-4.2-3.77-4.2s-3.77,1.58-3.77,4.2,1.68,4.2,3.77,4.2,3.77-1.58,3.77-4.2Z"/>
+      <path class="cls-2" d="M1538.78,112.3h8.28c5.62,0,9.48,3.19,9.48,8.4s-3.86,8.4-9.48,8.4h-8.28v-16.8Zm8.04,12.38c2.38,0,4.01-1.42,4.01-3.98s-1.63-3.98-4.01-3.98h-2.38v7.97h2.38Z"/>
+      <path class="cls-2" d="M1572.57,124.83v4.27h-13.97v-16.8h13.66v4.27h-8.09v1.97h7.11v4.08h-7.11v2.21h8.4Z"/>
+    </g>
+    <text class="cls-13" transform="translate(1499.56 129.1)"><tspan class="cls-12" x="0" y="0">C</tspan><tspan class="cls-9" x="17.5" y="0">ODE</tspan></text>
+  </g>
+  <circle class="cls-3" cx="1473.03" cy="289.39" r="13.1"/>
+  <circle class="cls-4" cx="1485.77" cy="989.07" r="26.2"/>
+  <rect class="cls-10" x="1459.93" y="347.35" width="26.2" height="26.2"/>
+  <polygon class="cls-1" points="1473.03 422.35 1486.49 418.4 1482.54 431.86 1486.49 445.32 1473.03 441.38 1459.57 445.32 1463.51 431.86 1459.57 418.4 1473.03 422.35"/>
+  <line class="cls-5" x1="1507.48" y1="289.39" x2="1695.63" y2="289.39"/>
+  <line class="cls-5" x1="1507.48" y1="503.28" x2="1713.91" y2="503.28"/>
+  <line class="cls-5" x1="1507.48" y1="360.45" x2="1663.1" y2="360.45"/>
+  <line class="cls-5" x1="1507.48" y1="431.86" x2="1732.1" y2="431.86"/>
+  <polygon class="cls-3" points="1473.03 490.18 1459.93 512.87 1486.13 512.87 1473.03 490.18"/>
+  <g>
+    <polyline class="cls-8" points="1473.82 989.07 1497.72 989.07 1488.14 979.48"/>
+    <polyline class="cls-8" points="1473.82 989.07 1497.72 989.07 1488.14 998.65"/>
+  </g>
+  <path class="cls-14" d="M1727.12,594.95c5.89,24.47,9.98,49.39,11.6,74.52,1.6,24.91,.83,50.09-3.39,74.72-4.13,24.13-11.55,47.76-22.98,69.45-11.93,22.65-28.2,42.48-46.64,60.13-18.68,17.88-39.29,33.57-60.06,48.91-2.6,1.92-5.21,3.84-7.82,5.76-1.1,.81-1.61,2.16-.9,3.42,.61,1.08,2.34,1.69,3.42,.9,21.23-15.61,42.49-31.3,62.02-49.04,19.26-17.49,36.77-37.14,49.93-59.68,12.57-21.54,21.16-45.28,26.19-69.68,5.11-24.77,6.71-50.2,5.73-75.44-1-25.62-4.61-51.14-10.15-76.16-.68-3.05-1.38-6.1-2.11-9.14-.75-3.13-5.58-1.8-4.82,1.33h0Z"/>
+  <path class="cls-14" d="M1592.73,912.98c-1.07,4.99-2.13,9.98-3.2,14.98-.53,2.5-1.07,4.99-1.6,7.49-.5,2.33-1.13,4.77-.58,7.14,.92,4.02,4.75,5.83,8.58,5.75,4.23-.09,8.3-1.82,12.27-3.11,5.54-1.79,11.07-3.58,16.61-5.37,3.05-.99,1.74-5.82-1.33-4.82-4.43,1.43-8.86,2.87-13.29,4.3-3.9,1.26-7.82,2.84-11.83,3.7-1.2,.26-2.74,.42-3.78,.25-1.13-.18-1.9-.5-2.29-1.54-.61-1.63,.22-3.85,.56-5.46,.48-2.25,.96-4.51,1.45-6.76,1.08-5.07,2.17-10.14,3.25-15.22,.67-3.14-4.15-4.48-4.82-1.33h0Z"/>
+</svg>

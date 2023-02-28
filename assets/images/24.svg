@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Frame_22" data-name="Frame 22" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Dégradé_sans_nom_10-4);
+      }
+
+      .cls-2 {
+        fill: url(#Dégradé_sans_nom_6);
+        stroke: #1d1d1b;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-3 {
+        fill: none;
+        stroke: #7237bd;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 10px;
+      }
+
+      .cls-4 {
+        fill: url(#Dégradé_sans_nom_8);
+      }
+
+      .cls-5 {
+        fill: url(#Dégradé_sans_nom_13);
+      }
+
+      .cls-6 {
+        fill: #fd0988;
+      }
+
+      .cls-7 {
+        fill: url(#Dégradé_sans_nom_10-2);
+      }
+
+      .cls-8 {
+        fill: url(#Dégradé_sans_nom_10-3);
+      }
+
+      .cls-9 {
+        fill: url(#Dégradé_sans_nom_11);
+      }
+
+      .cls-10 {
+        fill: url(#Dégradé_sans_nom_10);
+      }
+    </style>
+    <linearGradient id="Dégradé_sans_nom_6" data-name="Dégradé sans nom 6" x1="-7736.48" y1="-3.18" x2="-7733.1" y2="1076.82" gradientTransform="translate(-6774.53 1079.63) rotate(-180)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16163c"/>
+      <stop offset=".21" stop-color="#17173f"/>
+      <stop offset=".38" stop-color="#1d1d49"/>
+      <stop offset=".53" stop-color="#26265a"/>
+      <stop offset=".68" stop-color="#333371"/>
+      <stop offset=".82" stop-color="#444490"/>
+      <stop offset=".95" stop-color="#5959b5"/>
+      <stop offset="1" stop-color="#6262c5"/>
+    </linearGradient>
+    <linearGradient id="Dégradé_sans_nom_10" data-name="Dégradé sans nom 10" x1="562.4" y1="391" x2="631.13" y2="391" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fd0988"/>
+      <stop offset="1" stop-color="#7237bd"/>
+    </linearGradient>
+    <linearGradient id="Dégradé_sans_nom_10-2" data-name="Dégradé sans nom 10" x1="1578.48" y1="328.62" x2="1647.21" y2="328.62" xlink:href="#Dégradé_sans_nom_10"/>
+    <linearGradient id="Dégradé_sans_nom_11" data-name="Dégradé sans nom 11" x1="-8309.41" y1="220.93" x2="-8230.05" y2="220.93" gradientTransform="translate(-7946.3 432.55) rotate(-180)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#7237bd"/>
+      <stop offset="1" stop-color="#fd0988"/>
+    </linearGradient>
+    <linearGradient id="Dégradé_sans_nom_10-3" data-name="Dégradé sans nom 10" x1="1696.11" y1="-233.16" x2="1775.47" y2="-233.16" gradientTransform="translate(-436.04 376.04)" xlink:href="#Dégradé_sans_nom_10"/>
+    <linearGradient id="Dégradé_sans_nom_8" data-name="Dégradé sans nom 8" x1="1247.21" y1="503.89" x2="1315.94" y2="503.89" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fd0988"/>
+      <stop offset="1" stop-color="#6262c5"/>
+    </linearGradient>
+    <linearGradient id="Dégradé_sans_nom_10-4" data-name="Dégradé sans nom 10" x1="364.44" y1="628.31" x2="433.17" y2="628.31" xlink:href="#Dégradé_sans_nom_10"/>
+    <linearGradient id="Dégradé_sans_nom_13" data-name="Dégradé sans nom 13" x1="897.79" y1="224.5" x2="966.52" y2="224.5" gradientTransform="translate(431.77 -593.38) rotate(45)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6262c5"/>
+      <stop offset="1" stop-color="#7237bd"/>
+    </linearGradient>
+  </defs>
+  <rect class="cls-2" x=".25" y="-.19" width="1920" height="1080"/>
+  <line class="cls-3" x1="960" y1="582.31" x2="960" y2="-.19"/>
+  <circle class="cls-6" cx="960" cy="566.1" r="62.21"/>
+  <circle class="cls-10" cx="596.76" cy="391" r="34.37"/>
+  <circle class="cls-7" cx="1612.85" cy="328.62" r="34.37"/>
+  <polygon class="cls-9" points="323.43 245.98 363.11 177.25 283.75 177.25 323.43 245.98"/>
+  <polygon class="cls-8" points="1299.75 108.52 1260.07 177.25 1339.43 177.25 1299.75 108.52"/>
+  <rect class="cls-4" x="1247.21" y="469.52" width="68.73" height="68.73"/>
+  <polygon class="cls-1" points="398.8 604.01 433.17 593.95 423.1 628.31 433.17 662.68 398.8 652.61 364.44 662.68 374.5 628.31 364.44 593.95 398.8 604.01"/>
+  <rect class="cls-5" x="907.85" y="200.2" width="48.6" height="48.6" transform="translate(114.27 724.89) rotate(-45)"/>
+</svg>

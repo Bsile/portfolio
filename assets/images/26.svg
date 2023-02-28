@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Frame_23" data-name="Frame 23" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1920 1080">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: url(#Dégradé_sans_nom_6);
+        stroke: #1d1d1b;
+      }
+
+      .cls-1, .cls-2 {
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #fff;
+        stroke-width: 15px;
+      }
+
+      .cls-3 {
+        fill: #fd0988;
+      }
+    </style>
+    <linearGradient id="Dégradé_sans_nom_6" data-name="Dégradé sans nom 6" x1="-12271.1" y1="-3.18" x2="-12267.73" y2="1076.82" gradientTransform="translate(-11309.16 1079.63) rotate(-180)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16163c"/>
+      <stop offset=".21" stop-color="#17173f"/>
+      <stop offset=".38" stop-color="#1d1d49"/>
+      <stop offset=".53" stop-color="#26265a"/>
+      <stop offset=".68" stop-color="#333371"/>
+      <stop offset=".82" stop-color="#444490"/>
+      <stop offset=".95" stop-color="#5959b5"/>
+      <stop offset="1" stop-color="#6262c5"/>
+    </linearGradient>
+  </defs>
+  <rect class="cls-1" x=".25" y="-.19" width="1920" height="1080"/>
+  <line class="cls-2" x1=".25" y1="847.82" x2="1920" y2="847.82"/>
+  <circle class="cls-3" cx="960" cy="679.98" r="139.98"/>
+  <path class="cls-3" d="M686.15,456.32c0,18.75,0,37.5,0,56.25s0,37.33,0,56v31.75c0,3.22,5,3.22,5,0,0-18.75,0-37.5,0-56.25s0-37.33,0-56v-31.75c0-3.22-5-3.22-5,0h0Z"/>
+  <path class="cls-3" d="M665.67,598.07c.66,8.22,2.75,16.18,6.19,23.68,1.69,3.69,3.72,7.22,6.05,10.53,2.29,3.25,4.77,6.54,8.03,8.88,3.23,2.33,7.3,2.98,10.95,1.26,3.07-1.45,5.26-4.47,6.72-7.44,1.81-3.68,2.95-7.7,4.02-11.65,1.15-4.26,2.06-8.59,2.72-12.95,1.53-10.04,1.84-20.2,.82-30.31-.14-1.34-1.05-2.5-2.5-2.5-1.25,0-2.64,1.15-2.5,2.5,1.63,16.23-.11,32.67-5.23,48.16-1.44,4.34-4.73,12.39-10.67,9.69-3.02-1.37-5.26-4.4-7.18-6.99-2.2-2.98-4.15-6.15-5.82-9.46-3.68-7.27-5.94-15.3-6.6-23.42-.11-1.35-1.07-2.5-2.5-2.5-1.27,0-2.61,1.15-2.5,2.5h0Z"/>
+</svg>
