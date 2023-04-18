@@ -9114,6 +9114,14 @@ a {
 .cid-tn0prBMPXN .video-wrapper iframe {
   width: 100%;
 }
+@media (max-width: 991px) {
+  .cid-tn0prBMPXN .image-wrapper {
+    margin-bottom: 1rem;
+  }
+}
+.cid-tn0prBMPXN .row {
+  flex-direction: row-reverse;
+}
 .cid-tn0prBMPXN .mbr-section-title,
 .cid-tn0prBMPXN .mbr-section-subtitle,
 .cid-tn0prBMPXN .mbr-text {
