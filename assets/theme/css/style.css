@@ -788,9 +788,8 @@ body {
   height: auto;
   padding: 0.6rem 1.2rem;
   transition: border-color 0.25s ease 0s;
-  border: 1px solid transparent !important;
-  border-radius: 4px;
-  box-shadow: rgba(0, 0, 0, 0.07) 0px 1px 1px 0px, rgba(0, 0, 0, 0.07) 0px 1px 3px 0px, rgba(0, 0, 0, 0.03) 0px 0px 0px 1px;
+  border: 1px solid #b0b0b9 !important;
+  border-radius: 0px;
 }
 .form-active .form-control:invalid {
   border-color: red;
