@@ -51,14 +51,27 @@ Je créé et joue avec des formes, en gros.">
   <section data-bs-version="5.1" class="menu menu1 cid-tn0qSEppC5" once="menu" id="menu1-6n">
     
 
-    <nav class="navbar navbar-dropdown opa opacity navbar-fixed-top navbar-expand-lg">
-        <div class="container-fluid">
-            <div class="navbar-brand">
-                <span class="navbar-logo">
-                    <a href="index.html#Header">
-                        <img src="assets/images/anim-transparent-long.gif" alt="Logo" style="height: 4rem;">
-                    </a>
-                </span>
+    <section data-bs-version="5.1" class="menu menu1 cid-tJryk8cnWs" once="menu" id="menu1-9n">
+    
+        <script src="assets/Lottie/lottie.js" type="text/javascript"></script>
+    
+        <nav class="navbar navbar-dropdown opa opacity navbar-fixed-top navbar-expand-lg">
+            <div class="container-fluid">
+                <div class="navbar-brand">
+                    <span class="navbar-logo">
+                        <a href="index.html">
+                            <div id="svgContainer" style="height: 4rem;padding-top: 5px"></div>
+                            <script>
+                                var svgContainer = document.getElementById('svgContainer');
+                                var animItem = bodymovin.loadAnimation({
+                                  wrapper: svgContainer,
+                                  animType: 'svg',
+                                  loop: true,
+                                  path: 'assets/images/loader.json'
+                                });
+                                </script>
+                        </a>
+                    </span>
                 
             </div>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbarSupportedContent" data-bs-target="#navbarSupportedContent" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
