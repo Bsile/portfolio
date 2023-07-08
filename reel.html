@@ -32,13 +32,23 @@
   
   <section data-bs-version="5.1" class="menu menu1 cid-tn0qSEppC5" once="menu" id="menu1-6n">
     
-
+    <script src="assets/Lottie/lottie.js" type="text/javascript"></script>
+    
     <nav class="navbar navbar-dropdown opa opacity navbar-fixed-top navbar-expand-lg">
         <div class="container-fluid">
             <div class="navbar-brand">
                 <span class="navbar-logo">
-                    <a href="index.html#Header">
-                        <img src="assets/images/anim-transparent-long.gif" alt="Logo" style="height: 4rem;">
+                    <a href="index.html">
+                        <div id="loader" style="height: 3rem;"></div>
+                        <script>
+                            var svgContainer = document.getElementById('loader');
+                            var animItem = bodymovin.loadAnimation({
+                              wrapper: svgContainer,
+                              animType: 'svg',
+                              loop: true,
+                              path: 'assets/images/loader.json'
+                            });
+                            </script>
                     </a>
                 </span>
                 
