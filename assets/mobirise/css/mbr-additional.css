@@ -11289,6 +11289,9 @@ a {
   .cid-tJryk9T274 .image-wrapper {
     margin-bottom: 1rem;
   }
+  .cid-tJryk9T274 .ds-experience-list section {
+    padding-right: 70px;
+  }
 }
 .cid-tJryk9T274 img {
   width: 100%;
@@ -11297,6 +11300,9 @@ a {
   .cid-tJryk9T274 .text-wrapper {
     padding: 2rem;
     text-align: start;
+  }
+  .cid-tJryk9T274 .ds-experience-list section {
+    padding-right: 0px;
   }
 }
 .cid-tJryk9T274 .mbr-text {
@@ -11313,9 +11319,6 @@ a {
 }
 .cid-tJryk9T274 .ds-experience-section {
   padding-bottom: 120px;
-}
-.cid-tJryk9T274 .ds-experience-list section {
-  padding-right: 70px;
 }
 .cid-tJryk9T274 .ds-experience-list {
   padding-top: 15px;
