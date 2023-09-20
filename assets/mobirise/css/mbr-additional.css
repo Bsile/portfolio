@@ -11551,12 +11551,11 @@ a {
   row-gap: 8px;
   -webkit-transition: color 150ms ease;
   transition: color 150ms ease;
-  color: #aaaaaa;
+  color: #777;
   text-decoration: none;
 }
 .cid-tQpmhHyLvN .project {
-  color: rgb(56, 56, 63)
-  transition: color 500ms ease;
+  color: #777;
 }
 .cid-tQpmhHyLvN .icon {
   width: 10px;
@@ -11566,5 +11565,5 @@ a {
   fill: none;
   stroke-width: 1.5;
   stroke-miterlimit: 10;
-  stroke: rgb(56, 56, 63)
+  stroke: #777;
 }
