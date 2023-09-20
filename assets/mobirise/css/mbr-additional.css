@@ -11527,11 +11527,11 @@ a {
   flex-wrap: wrap;
 }
 .cid-tQpmhHyLvN .left {
-  align-content: left;
+  align-content: flex-start;
   margin: 0 !important;
 }
 .cid-tQpmhHyLvN .right {
-  align-content: right;
+  align-content: flex-end;
   margin: 0 !important;
 }
 .cid-tQpmhHyLvN .project-flex {
@@ -11562,4 +11562,10 @@ a {
 .cid-tQpmhHyLvN .icon {
   width: 20px;
   height: 20px;
+}
+.cid-tQpmhHyLvN .st0 {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-miterlimit: 10;
+  stroke:#38383F
 }
