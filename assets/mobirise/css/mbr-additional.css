@@ -11528,7 +11528,9 @@ a {
 }
 .cid-tQpmhHyLvN .left {
   align-content: left;
+  margin: 0 !important;
 }
 .cid-tQpmhHyLvN .right {
   align-content: right;
+  margin: 0 !important;
 }
