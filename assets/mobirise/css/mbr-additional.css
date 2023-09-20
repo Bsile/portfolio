@@ -11518,7 +11518,6 @@ a {
 
 .cid-tQpmhHyLvN {
   padding-top: 5rem;
-  padding-bottom: 5rem;
   background-color: #ffffff;
 }
 .cid-tQpmhHyLvN .mbr-section-btn {
@@ -11529,18 +11528,26 @@ a {
 .cid-tQpmhHyLvN .left {
   align-content: flex-start;
   margin: 0 !important;
+  stroke:#38383F
+  color(srgb 56 56 63)
 }
 .cid-tQpmhHyLvN .right {
   align-content: flex-end;
   margin: 0 !important;
+  stroke:#38383F
+  color(srgb 56 56 63)
 }
 .cid-tQpmhHyLvN .right:hover {
-  color: #0e0f0e
+  color: #0e0f0e;
+  stroke: #0e0f0e;
   transition: color 500ms ease;
+  transition: stroke 500ms ease;
 }
 .cid-tQpmhHyLvN .left:hover {
-  color: #0e0f0e
+  color: #0e0f0e;
+  stroke: #0e0f0e;
   transition: color 500ms ease;
+  transition: stroke 500ms ease;
 }
 .cid-tQpmhHyLvN .project-flex {
   display: flex;
@@ -11574,5 +11581,4 @@ a {
   fill: none;
   stroke-width: 1.5;
   stroke-miterlimit: 10;
-  stroke:#38383F
 }
