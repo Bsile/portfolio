@@ -11555,7 +11555,7 @@ a {
   text-decoration: none;
 }
 .cid-tQpmhHyLvN .project {
-  color: #aaaaaa;
+  color: rgb(56, 56, 63)
   transition: color 500ms ease;
 }
 .cid-tQpmhHyLvN .icon {
@@ -11566,5 +11566,5 @@ a {
   fill: none;
   stroke-width: 1.5;
   stroke-miterlimit: 10;
-  stroke: #aaaaaa
+  stroke: rgb(56, 56, 63)
 }
