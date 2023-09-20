@@ -11534,3 +11534,32 @@ a {
   align-content: right;
   margin: 0 !important;
 }
+.cid-tQpmhHyLvN .project-flex {
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  column-gap: 32px;
+  row-gap: 32px;
+  padding-top: 20px;
+}
+.cid-tQpmhHyLvN .project-wrapper {
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 8px;
+  -webkit-transition: color 150ms ease;
+  transition: color 150ms ease;
+  color: #38383f;
+  text-decoration: none;
+}
+.cid-tQpmhHyLvN .project {
+  transition: color 500ms ease;
+}
+.cid-tQpmhHyLvN .icon {
+  width: 20px;
+  height: 20px;
+}
