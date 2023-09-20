@@ -41,6 +41,13 @@ body {
 .display-7 > .mbr-iconfont {
   font-size: 1.5rem;
 }
+/* loading animation */
+.content {display:none;}
+.preload { width:100px;
+    height: 100px;
+    position: fixed;
+    top: 50%;
+    left: 50%;}
 /* ---- Fluid typography for mobile devices ---- */
 /* 1.4 - font scale ratio ( bootstrap == 1.42857 ) */
 /* 100vw - current viewport width */
