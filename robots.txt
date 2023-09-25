@@ -9,3 +9,4 @@ Disallow: /snowdraktv
 Disallow: /nine
 Disallow: /sandbox
 Disallow: /mentions-legales
+Disallow: *.pdf
