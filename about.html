@@ -209,30 +209,6 @@ function reveal() {
 window.addEventListener("scroll", reveal);
 
 </script>
-
-<script>
-
-function reveal() {
-  var reveals = document.querySelectorAll(".about__experiences__experience__role");
-  var elementVisible = 100; // Décalage en pixels
-
-  for (var i = 0; i < reveals.length; i++) {
-    var windowHeight = window.innerHeight;
-    var elementTop = reveals[i].getBoundingClientRect().top;
-
-    if (elementTop < windowHeight - elementVisible) {
-      reveals[i].classList.add("is-visible");
-    } else {
-      reveals[i].classList.remove("is-visible");
-    }
-  }
-}
-
-window.addEventListener("scroll", reveal);
-
-</script>
-
-    
     
 
     <div class="container">
