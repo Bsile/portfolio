@@ -362,6 +362,53 @@ window.addEventListener("scroll", reveal);
 
 
 
+  <script>
+  
+  function reveal() {
+    var reveals = document.querySelectorAll(".opacity");
+  
+    for (var i = 0; i < reveals.length; i++) {
+      var windowHeight = window.innerHeight;
+      var elementTop = reveals[i].getBoundingClientRect().top;
+      var elementVisible = 0;
+  
+      if (elementTop < windowHeight - elementVisible) {
+        reveals[i].classList.add("active");
+      } else {
+        reveals[i].classList.remove("active");
+      }
+    }
+  }
+  
+  window.addEventListener("scroll", reveal);
+  
+  </script>
+  
+  
+  
+  <!-- Place your own code below -->
+  
+  <div class="container">
+  <h3 class="mbr-section-subtitle align-center mbr-fonts-style mb-3 opacity display-5"><strong>Idées non retenues</strong></h3>
+  <div class="row">
+    <div class="column opacity">
+      <img src="assets/images/ltddnonretenumains.webp" alt="non retenu mains">
+    </div>
+    <div class="column opacity">
+      <img src="assets/images/ltddnonretenuvaleurs.webp" alt="non retenu valeurs">
+    </div>
+  </div>
+  </div>
+  
+  </section>
+
+
+<section class="mbr-section mbr-section--no-padding cid-tx6OMGaUtn" id="witsec-html-block-8u">
+
+<section class="mbr-section mbr-section--no-padding cid-twV2CYECS0" id="witsec-html-block-8l" style="padding-bottom: 60px;">
+
+
+
 <script>
 
 function reveal() {
@@ -417,10 +464,6 @@ window.addEventListener("scroll", reveal);
 </div>
 
 </section>
-
-
-<section class="mbr-section mbr-section--no-padding cid-tx6OMGaUtn" id="witsec-html-block-8u">
-
 
 
 <script>
