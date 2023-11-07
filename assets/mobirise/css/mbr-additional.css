@@ -11207,3 +11207,49 @@ a {
 .cid-tn0qSEppC5 .st2 {
   fill: #E84855;
 }
+.cid-ta0dINAcS .testimonial-block{
+  position:relative;
+  padding-top: 4rem;
+}
+.cid-ta0dINAcS .testimonial-block .inner-box{
+  position:relative;
+  padding:0 30px 30px;
+  background-color:#EFEFEF
+}
+.cid-ta0dINAcS .testimonial-block .inner-box .image{
+  position:relative;
+  width:100px;
+  height:100px;
+  border-radius:50%;
+  overflow:hidden;
+  margin-top:-50px;
+  margin-bottom:25px;
+  display:inline-block
+}
+.cid-ta0dINAcS .testimonial-block .inner-box .content{
+  position:relative
+}
+.cid-ta0dINAcS .testimonial-block .inner-box .content i{
+  position:absolute;
+  right:0;
+  top:-55px;
+  font-size:30px;
+  font-style:italic;
+  color:#EBA61B;
+  opacity: 50%;
+}
+.cid-ta0dINAcS .testimonial-block .inner-box .content .author-info{
+  position:relative;
+  font-size:20px;
+  font-weight:500;
+  color:#fff
+}
+.cid-ta0dINAcS .testimonial-block .inner-box .content span{
+  position:relative;
+  font-size:14px
+}
+.cid-ta0dINAcS .testimonial-block .inner-box .content .text{
+  position:relative;
+  margin-top:20px;
+  font-size:15px
+}
