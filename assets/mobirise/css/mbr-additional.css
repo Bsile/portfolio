@@ -11251,5 +11251,13 @@ a {
 .cid-ta0dINAcS .testimonial-block .inner-box .content .text{
   position:relative;
   margin-top:20px;
+  margin-bottom: 0px !important;
   font-size:15px
+}
+.cid-ta0dINAcS .opacity {
+  opacity: 0;
+  transition: 0.8s all ease;
+}
+.cid-ta0dINAcS .opacity.active {
+  opacity: 1;
 }
