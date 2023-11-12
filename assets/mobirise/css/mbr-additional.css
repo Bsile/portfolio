@@ -11379,3 +11379,6 @@ a {
     transform: translateY(0px);
   }
 }
+.cid-tn0nEs3Dpa .form-control, form .btn {
+  min-height: 42px;
+}
