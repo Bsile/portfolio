@@ -11261,3 +11261,121 @@ a {
 .cid-ta0dINAcS .opacity.active {
   opacity: 1;
 }
+.cid-toSeMUCaS5 {
+  padding-top: 1rem;
+  background-color: #ffffff;
+}
+.cid-toSeMUCaS5 img,
+.cid-toSeMUCaS5 .item-img {
+  width: 100%;
+}
+.cid-toSeMUCaS5 .item:focus,
+.cid-toSeMUCaS5 span:focus {
+  outline: none;
+}
+.cid-toSeMUCaS5 .item {
+  cursor: auto;
+  margin-bottom: 2rem;
+}
+.cid-toSeMUCaS5 .item-wrapper {
+  position: relative;
+  border-radius: 0px;
+  background: #fafafa;
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+}
+@media (min-width: 992px) {
+  .cid-toSeMUCaS5 .item-wrapper .item-content {
+    padding: 2rem;
+  }
+  .cid-toSeMUCaS5 .col-lg-6 {
+    flex: 0 0 auto;
+    width: 33%;
+  }
+}
+@media (max-width: 991px) {
+  .cid-toSeMUCaS5 .item-wrapper .item-content {
+    padding: 1rem;
+  }
+}
+.cid-toSeMUCaS5 .item-wrapper {
+  background: transparent;
+}
+.cid-toSeMUCaS5 .mbr-section-btn {
+  margin-top: auto !important;
+}
+.cid-toSeMUCaS5 .mbr-section-title {
+  color: #232323;
+}
+.cid-toSeMUCaS5 .mbr-text,
+.cid-toSeMUCaS5 .mbr-section-btn {
+  text-align: left;
+  color: #38383f;
+}
+.cid-toSeMUCaS5 .item-title {
+  text-align: left;
+}
+.cid-toSeMUCaS5 .item-subtitle {
+  text-align: center;
+}
+.cid-toSeMUCaS5 .reveal {
+  position: relative;
+  transform: translateY(150px);
+  opacity: 0;
+  transition: 1s all ease;
+}
+.cid-toSeMUCaS5 .reveal.active {
+  transform: translateY(0);
+  opacity: 1;
+}
+.cid-toSeMUCaS5 .image {
+  opacity: 1;
+  transition: 0.8s ease;
+}
+.cid-toSeMUCaS5 .image:hover {
+  opacity: 0.9;
+}
+.cid-toSeMUCaS5 .before {
+  opacity: 0;
+  transform: translateY(50px);
+}
+.cid-toSeMUCaS5 .animdelay2 {
+  animation: delay 1s ease 1s 1 normal forwards;
+}
+@keyframes delay2 {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 100;
+    transform: translateY(0px);
+  }
+}
+.cid-toSeMUCaS5 .animdelay3 {
+  animation: delay 1s ease 1.1s 1 normal forwards;
+}
+@keyframes delay3 {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 100;
+    transform: translateY(0px);
+  }
+}
+.cid-toSeMUCaS5 .animdelay4 {
+  animation: delay 1s ease 1.2s 1 normal forwards;
+}
+@keyframes delay4 {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 100;
+    transform: translateY(0px);
+  }
+}
