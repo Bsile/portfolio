@@ -9262,6 +9262,21 @@ a {
 .cid-twmHifAEMv .mbr-text {
   color: #38383f;
 }
+.cid-twmHifAEMv .opa {
+  opacity: 0;
+}
+.cid-twmHifAEMv .opacity {
+  animation: opacity 1s ease 1.5s 1 normal forwards;
+}
+@keyframes opacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 100;
+  }
+}
+
 .cid-tvd0dJvKic {
   padding-top: 0px;
   padding-bottom: 90px;
