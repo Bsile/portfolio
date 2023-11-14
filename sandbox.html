@@ -135,7 +135,7 @@ $("modal").on('hidden.bs.modal', function (e) {
   <div class="column">
     <a href="javascript:OpenModal('JBL')"><img class="reveal image" src="assets/images/jbl-preview.webp" alt="JBL"></a>
     <a href="javascript:OpenModal('Ekela')"><img class="reveal image" src="assets/images/ekela.gif" alt="Ekela"></a>
-    <a href="javascript:OpenModal('Colorbrew')"><img class="reveal image" src="assets/images/raw-preview.webp" alt="Color brew"></a>
+    <a href="javascript:OpenModal('PsychedelicPoster')"><img class="reveal image" src="assets/images/psychedelicposter.webp" alt="Psychedelic poster"></a>
     <a href="javascript:OpenModal('Automne')"><img class="reveal image" src="assets/images/ekela-banner.webp" alt="Ekela banner"></a>
   </div>
   <div class="column">
@@ -872,18 +872,18 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	
 	
-	<div><div class="modal fade" id="Colorbrew" tabindex="-1" role="dialog" aria-labelledby="ColorbrewLabel" aria-hidden="true">  <div class="modal-dialog  " style="height:auto" role="document">    <div class="modal-content"><div class="modal-body display-7" id="Colorbrew_body"><img src="assets/images/raw.webp" alt="Color brew">
+	<div><div class="modal fade" id="PsychedelicPoster" tabindex="-1" role="dialog" aria-labelledby="PsychedelicPoster" aria-hidden="true">  <div class="modal-dialog  " style="height:auto" role="document">    <div class="modal-content"><div class="modal-body display-7" id="Colorbrew_body"><img src="assets/images/psychedelicposterfull.webp" alt="PsychedelicPoster">
 <br>
 <h5>Affiche fictive dans le cadre d'un projet scolaire.</h5></div>    </div>  </div></div><script> 
 document.addEventListener("DOMContentLoaded", function() { 
   if(typeof jQuery === "function") {
-    $("#Colorbrew").on("hidden.bs.modal", function () { 
-      var html = $( "#Colorbrew_body" ).html(); 
-      $( "#Colorbrew_body" ).empty(); 
-      $( "#Colorbrew_body" ).append(html); 
+    $("#PsychedelicPoster").on("hidden.bs.modal", function () { 
+      var html = $( "#PsychedelicPoster_body" ).html(); 
+      $( "#PsychedelicPoster_body" ).empty(); 
+      $( "#PsychedelicPoster_body" ).append(html); 
     }) 
   } else { 
-      var mdw = document.getElementById("#Colorbrew") 
+      var mdw = document.getElementById("#PsychedelicPoster") 
       mdw.addEventListener("hidden.bs.modal", function(event) { 
         mdw.innerHTML = mdw.innerHTML; 
       }); 
