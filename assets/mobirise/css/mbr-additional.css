@@ -11516,3 +11516,17 @@ a {
   border: 1px solid;
   border-color: #38383f;
 }
+.cid-u0k87F5DUK .opa {
+  opacity: 0;
+}
+.cid-u0k87F5DUK .opacity {
+  animation: opacity 1s ease 1.8s 1 normal forwards;
+}
+@keyframes opacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 100;
+  }
+}
