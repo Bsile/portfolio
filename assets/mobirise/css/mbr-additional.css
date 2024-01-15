@@ -11531,13 +11531,13 @@ a {
   }
 }
 
-.hover:hover {
+.itemhover:hover {
   transform: translateY(-8px);
   color: #100c0c;
   stroke: #100c0c;
   transition: transform 300ms;
 }
-.hover {
+.itemhover {
   stroke: #38383f;
   color: #38383f;
   
