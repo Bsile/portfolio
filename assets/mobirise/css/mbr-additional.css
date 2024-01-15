@@ -11405,10 +11405,10 @@ a {
 }
 @media (min-width: 992px) {
   .cid-u0k87F5DUK .carousel {
-    min-height: 800px;
+    min-height: 600px;
   }
   .cid-u0k87F5DUK .carousel img {
-    max-height: 800px;
+    max-height: 600px;
     object-fit: contain;
   }
 }
@@ -11475,12 +11475,12 @@ a {
 }
 .cid-u0k87F5DUK .carousel-control.carousel-control-prev {
   left: 0;
-  margin-left: 2.5rem;
+  margin-left: 4rem;
   opacity: 100% !important;
 }
 .cid-u0k87F5DUK .carousel-control.carousel-control-next {
   right: 0;
-  margin-right: 2.5rem;
+  margin-right: 4rem;
   opacity: 100% !important;
 }
 @media (max-width: 767px) {
