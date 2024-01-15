@@ -11530,3 +11530,39 @@ a {
     opacity: 100;
   }
 }
+
+.hover:hover {
+  transform: translateY(-8px);
+  color: #100c0c;
+  stroke: #100c0c;
+  transition: transform 300ms;
+}
+.hover {
+  stroke: #38383f;
+  color: #38383f;
+  
+  transition: transform 300ms;
+}
+.menuhover:hover {
+  transform: translateY(-4px);
+  color: #100c0c;
+  stroke: #100c0c;
+  transition: transform 300ms;
+}
+.menuhover {
+  stroke: #38383f;
+  color: #38383f;
+  
+  transition: transform 300ms;
+}
+.buttonhover:hover {
+  transform: translateY(-4px);
+  color: #100c0c;
+  stroke: #100c0c;
+  background-color: #100c0c;
+}
+.buttonhover {
+  stroke: #38383f;
+  color: #38383f;
+  background-color: #38383f;
+}
