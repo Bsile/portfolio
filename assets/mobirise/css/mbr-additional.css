@@ -11566,3 +11566,12 @@ a {
   color: #38383f;
   background-color: #38383f;
 }
+.cid-ahdizbdu .testimonial-block .inner-box .content i{
+  position:absolute;
+  right:0;
+  top:-55px;
+  font-size:30px;
+  font-style:italic;
+  color:#2c07ff;
+  opacity: 50%;
+}
