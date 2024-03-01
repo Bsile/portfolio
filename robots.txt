@@ -8,6 +8,7 @@ Disallow: /humanoids
 Disallow: /snowdraktv
 Disallow: /nine
 Disallow: /latavernedudesign
+Disallow: /makebetter
 Disallow: /sandbox
 Disallow: /mentions-legales
 Disallow: *.pdf
