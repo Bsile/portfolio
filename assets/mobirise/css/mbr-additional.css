@@ -1239,6 +1239,7 @@ a {
 .cid-toSeMUCaS4 .image {
   opacity: 1;
   transition: 0.8s ease;
+  width: 100%;
 }
 .cid-toSeMUCaS4 .image:hover {
   opacity: 0.9;
