@@ -68,7 +68,6 @@ if (typeof window.lenis === 'undefined') {
 function initializeLenis() {
   if (window.lenis) {
     window.lenis.destroy(); // Détruire l'ancienne instance de Lenis si elle existe
-    /*console.log('Lenis destroyed');*/
   }
 
   // init lenis
@@ -77,7 +76,6 @@ function initializeLenis() {
     smooth: true,
   });
 
-  /*console.log('Lenis initialized');*/
 
   const loop = (time) => {
     window.lenis.raf(time);
@@ -87,7 +85,6 @@ function initializeLenis() {
   requestAnimationFrame(loop);
 
   window.lenis.on('scroll', (e) => {
-    /*console.log(e);*/
   });
 
   window.lenis.on('scroll', ScrollTrigger.update);
@@ -272,11 +269,9 @@ window.onload = onload;
 
 function popupvimeo() {
   $(document).ready(function () {
-    console.log('Removing previous event listeners for .popup-vimeo...');
     // Détacher tous les écouteurs d'événements précédemment attachés à .popup-vimeo
     $('.popup-vimeo').off('click.magnificPopup');
 
-    console.log('Adding new event listeners for .popup-vimeo...');
     // Ajouter les nouveaux écouteurs d'événements
     $('.popup-vimeo').magnificPopup({
       type: 'iframe',
@@ -460,25 +455,20 @@ function pageentrance() {
 function loadAboutScripts() {
   return new Promise((resolve, reject) => {
     if (typeof THREE !== 'undefined') {
-      console.log('Three.js is already loaded.');
       resolve();
     } else {
       // Check if the script is already being loaded
       const existingScript = document.querySelector('script[src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js"]');
       if (existingScript) {
-        console.log('Three.js script is already being loaded.');
         existingScript.addEventListener('load', resolve);
         existingScript.addEventListener('error', reject);
       } else {
-        console.log('Loading Three.js script...');
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r79/three.min.js';
         script.onload = () => {
-          console.log('Three.js script loaded successfully.');
           resolve();
         };
         script.onerror = () => {
-          console.error('Failed to load Three.js script.');
           reject();
         };
         document.head.appendChild(script);
@@ -493,7 +483,6 @@ let renderer, scene, camera, planeMesh;
 let animationFrameId = null;
 
 function webglpixeleffect() {
-  console.log('Initializing WebGL effect...');
   const imageContainer = document.getElementById("imageContainer");
   const imageElement = document.getElementById("webglpixeleffect");
 
@@ -540,7 +529,6 @@ function webglpixeleffect() {
   `;
 
   function initializeScene(texture) {
-    console.log('Initializing scene...');
     scene = new THREE.Scene();
 
     const imageAspect = imageElement.naturalWidth / imageElement.naturalHeight;
@@ -587,7 +575,6 @@ function webglpixeleffect() {
   }
 
   function onResize() {
-    console.log('Resizing...');
     const containerAspect = imageContainer.offsetWidth / imageContainer.offsetHeight;
     const imageAspect = imageElement.naturalWidth / imageElement.naturalHeight;
 
@@ -669,7 +656,6 @@ function webglpixeleffect() {
   }
 
   // Ajout des nouveaux event listeners
-  console.log('Adding new event listeners...');
   imageContainer.addEventListener("mousemove", handleMouseMove);
   imageContainer.addEventListener("mouseenter", handleMouseEnter);
   imageContainer.addEventListener("mouseleave", handleMouseLeave);
@@ -677,12 +663,10 @@ function webglpixeleffect() {
   // Nettoyage
   function cleanupWebGL() {
     if (renderer) {
-      console.log('Cleaning up WebGL...');
       cancelAnimationFrame(animationFrameId);
       animationFrameId = null;
 
       // Suppression des event listeners de imageContainer
-      console.log('Removing event listeners...');
       imageContainer.removeEventListener("mousemove", handleMouseMove);
       imageContainer.removeEventListener("mouseenter", handleMouseEnter);
       imageContainer.removeEventListener("mouseleave", handleMouseLeave);
@@ -829,21 +813,17 @@ let swiperInstance;
 function loadSwiperScripts() {
   return new Promise((resolve, reject) => {
     if (typeof Swiper !== 'undefined') {
-      console.log('Swiper.js is already loaded.');
       resolve();
     } else {
       // Check if the script is already being loaded
       const existingScript = document.querySelector('script[src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"]');
       if (existingScript) {
-        console.log('Swiper.js script is already being loaded.');
         existingScript.addEventListener('load', resolve);
         existingScript.addEventListener('error', reject);
       } else {
-        console.log('Loading Swiper.js script...');
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js';
         script.onload = () => {
-          console.log('Swiper.js script loaded successfully.');
           resolve();
         };
         script.onerror = () => {
@@ -864,7 +844,6 @@ function loadSwiperScripts() {
 
 function swiperAnimation() {
   if (swiperInstance) {
-    console.log('Swiper instance already exists.');
     return;
   }
 
@@ -896,7 +875,6 @@ function destroySwiper() {
   if (swiperInstance) {
     swiperInstance.destroy(true, true);
     swiperInstance = null;
-    console.log('Swiper instance destroyed.');
   }
 }
 
@@ -904,7 +882,6 @@ function initSwiper() {
   loadSwiperScripts().then(() => {
     swiperAnimation();
   }).catch((error) => {
-    console.error('Error loading Swiper scripts:', error);
   });
 }
 
@@ -934,22 +911,18 @@ function initParallax() {
 }
 
 function cleanupParallax() {
-  console.log('Nettoyage du parallaxe en cours...');
 
   gsap.utils.toArray(".parallax-container .parallax").forEach((section, i) => {
     const tweens = gsap.getTweensOf(section);
 
     if (tweens.length > 0) {
-      console.log(`Arrêt des animations pour l'élément ${section}`);
       tweens.forEach(tween => {
         tween.kill(); // Arrête toutes les animations associées à la section
       });
     } else {
-      console.log(`Aucune animation trouvée pour l'élément ${section}`);
     }
   });
 
-  console.log('Nettoyage du parallaxe terminé.');
 }
 
 
@@ -1113,7 +1086,6 @@ class DragScroll {
       this.resizeTimeout = null;
     }
 
-    console.log("All listeners and timers removed");
   }
 
 
@@ -1183,7 +1155,6 @@ const cleanupScroll = () => {
   if (scroll) {
     scroll.removeEvents();
     scroll = null;
-    console.log("Listeners and scroll instance removed");
   }
 };
 
@@ -1245,7 +1216,6 @@ function loadPlayerScripts() {
     const existingVideoCSS = document.querySelector('link[href="https://cdn.vidstack.io/player/video.css"]');
 
     if (existingScript && existingThemeCSS && existingVideoCSS) {
-      console.log('Player.js and CSS are already loaded.');
       resolve();
     } else {
       // Create an array to hold promises for loading scripts and styles
@@ -1253,15 +1223,12 @@ function loadPlayerScripts() {
 
       // Load player.js script if not already loaded
       if (!existingScript) {
-        console.log('Loading Player.js script...');
         const script = document.createElement('script');
         script.src = 'https://cdn.vidstack.io/player';
         script.type = 'module';
         script.onload = () => {
-          console.log('Player.js script loaded successfully.');
         };
         script.onerror = () => {
-          console.error('Failed to load Player.js script.');
           reject();
         };
         document.head.appendChild(script);
@@ -1273,7 +1240,6 @@ function loadPlayerScripts() {
 
       // Load player theme CSS if not already loaded
       if (!existingThemeCSS) {
-        console.log('Loading Player.js theme CSS...');
         const themeLink = document.createElement('link');
         themeLink.rel = 'stylesheet';
         themeLink.href = 'https://cdn.vidstack.io/player/theme.css';
@@ -1286,7 +1252,6 @@ function loadPlayerScripts() {
 
       // Load player video CSS if not already loaded
       if (!existingVideoCSS) {
-        console.log('Loading Player.js video CSS...');
         const videoLink = document.createElement('link');
         videoLink.rel = 'stylesheet';
         videoLink.href = 'https://cdn.vidstack.io/player/video.css';
@@ -1300,11 +1265,9 @@ function loadPlayerScripts() {
       // Resolve the main promise when all scripts and styles are loaded
       Promise.all(loadPromises)
         .then(() => {
-          console.log('All Player.js resources loaded successfully.');
           resolve();
         })
         .catch((err) => {
-          console.error('Failed to load Player.js resources:', err);
           reject(err);
         });
     }
@@ -1325,12 +1288,10 @@ function observeSections() {
   const sections = document.querySelectorAll(".sidebar-chapters-wrapper a[data-target]");
   const sidebarLinks = document.querySelectorAll(".chapter");
 
-  console.log("Sections trouvées :", sections.length);
 
   // Déconnexion de l'ancien observer si existant
   if (observer) {
     observer.disconnect();
-    console.log("Ancien observer déconnecté.");
   }
 
   // Initialisation de l'observateur
@@ -1339,7 +1300,6 @@ function observeSections() {
       let margin = entry.target.id === "main" ? "-10% 0px -90% 0px" : "0px 0px -80% 0px";
       observer.rootMargin = margin;  // Ajuste dynamiquement
 
-      console.log("Observée :", entry.target.id, "rootMargin:", margin, "Visible:", entry.isIntersecting);
       
       if (entry.isIntersecting) {
         // Suppression de l'active de tous les liens
@@ -1349,7 +1309,6 @@ function observeSections() {
         const matchingLink = document.querySelector(`.sidebar-chapters-wrapper a[data-target="#${entry.target.id}"]`);
         if (matchingLink) {
           matchingLink.classList.add("active");
-          console.log("Ajout de active à :", matchingLink.textContent.trim());
         }
       }
     });
@@ -1361,16 +1320,13 @@ function observeSections() {
     const section = document.getElementById(sectionId);
     if (section) {
       observer.observe(section);
-      console.log("Observation de la section :", sectionId);
     } else {
-      console.log("⚠️ Aucune section trouvée pour l'ID :", sectionId);
     }
   });
 }
 
 // Fonction améliorée pour détecter la section la plus proche du centre
 function updateActiveChapter() {
-  console.log("Mise à jour des chapitres actifs...");
 
   const sections = document.querySelectorAll(".sidebar-chapters-wrapper a[data-target]");
   let minDistance = Infinity;
@@ -1388,7 +1344,6 @@ function updateActiveChapter() {
 
       // Vérifier que la section est bien dans la fenêtre visible
       if (rect.bottom > 0 && rect.top < window.innerHeight) {
-        console.log(`Section: ${sectionId}, Centre: ${sectionCenter}, Distance from center: ${distanceFromCenter}`);
 
         // Sélectionner la section la plus proche du centre de l'écran
         if (distanceFromCenter < minDistance) {
@@ -1400,7 +1355,6 @@ function updateActiveChapter() {
   });
 
   if (activeSection) {
-    console.log(`🌟 Section active détectée : ${activeSection.id}`);
     // Désactive tous les chapitres avant d'activer celui en cours
     document.querySelectorAll('.chapter').forEach(chap => chap.classList.remove('active'));
 
@@ -1408,7 +1362,6 @@ function updateActiveChapter() {
     let activeLink = document.querySelector(`.sidebar-chapters-wrapper a[data-target="#${activeSection.id}"]`);
     if (activeLink) {
       activeLink.classList.add('active');
-      console.log(`✔️ Activation du chapitre : ${activeLink.textContent.trim()}`);
     }
   }
 }
@@ -1423,6 +1376,5 @@ window.addEventListener("scroll", updateActiveChapter);
 function clearObserver() {
   if (observer) {
     observer.disconnect();
-    console.log("Observer nettoyé.");
   }
 }
