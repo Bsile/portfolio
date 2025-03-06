@@ -907,6 +907,21 @@ footer h2 {
     transition: all ease 0.4s;
 }
 
+.extrasandbox {
+    position: absolute;
+    left: 50%;
+    bottom: 0vw;
+    top: 2.5vw;
+    transform: translate(-50%, 0%);
+    font-family: Inter;
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: -1px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: all ease 0.4s;
+}
+
 #extra p {
     color: var(--contenttransparent);
     transition: all ease 0.4s;
