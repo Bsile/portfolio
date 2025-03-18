@@ -271,20 +271,17 @@ window.onload = onload;
 
 
 function popupvimeo() {
-  $(document).ready(function () {
-    console.log('Removing previous event listeners for .popup-vimeo...');
-    // Détacher tous les écouteurs d'événements précédemment attachés à .popup-vimeo
-    $('.popup-vimeo').off('click.magnificPopup');
+  console.log('Removing previous event listeners for .popup-vimeo...');
+  $('.popup-vimeo').off('click.magnificPopup'); // Nettoie les anciens écouteurs
 
-    console.log('Adding new event listeners for .popup-vimeo...');
-    // Ajouter les nouveaux écouteurs d'événements
-    $('.popup-vimeo').magnificPopup({
-      type: 'iframe',
-      removalDelay: 300,
-      mainClass: 'mfp-fade'
-    });
+  console.log('Adding new event listeners for .popup-vimeo...');
+  $('.popup-vimeo').magnificPopup({
+    type: 'iframe',
+    removalDelay: 300,
+    mainClass: 'mfp-fade'
   });
 }
+document.addEventListener("DOMContentLoaded", popupvimeo);
 
 
 

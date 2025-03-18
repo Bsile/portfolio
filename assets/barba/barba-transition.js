@@ -106,6 +106,9 @@ barba.hooks.afterEnter((data) => {
       }
     });
   }
+  if (data.next.namespace === 'home') {
+    popupvimeo();
+  }
 });
 
 
