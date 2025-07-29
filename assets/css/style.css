@@ -2208,6 +2208,10 @@ span .three {
     transition: all ease 0.4s;
 }
 
+.accordion-item {
+    width: calc(33% - 2.5vw) !important;
+}
+
 #imgbehind {
     position: absolute;
     width: 150px;
@@ -2485,16 +2489,16 @@ span .three {
 
 
 
-.accordion:hover .accordion-item:hover h5 svg,
-.accordion .accordion-item--default h5 svg {
+.accordion:hover .accordion-item:hover h3 svg,
+.accordion .accordion-item--default h3 svg {
     transform: rotate(0deg);
 }
 
-.accordion:hover .accordion-item:hover h5 svg {
+.accordion:hover .accordion-item:hover h3 svg {
     transform: rotate(90deg);
 }
 
-.accordion:hover .accordion-item:hover .accordion-item-content,
+/*.accordion:hover .accordion-item:hover .accordion-item-content,
 .accordion .accordion-item--default .accordion-item-content {
     max-height: 100%;
 }
@@ -2504,7 +2508,7 @@ span .three {
     max-height: 0%;
     overflow: hidden;
     transition: max-height 0.6s;
-}
+}*/
 
 
 
@@ -2794,6 +2798,11 @@ span .three {
 
     #rightcolumnstory {
         width: 100%;
+        padding-bottom: 60px;
+    }
+
+    .accordion-item {
+    width: 100% !important;
     }
 
     #aboutheader {
