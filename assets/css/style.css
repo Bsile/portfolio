@@ -6118,6 +6118,12 @@ span .three {
     width: auto !important;
 }
 
+.sandboxslider-item .cinema{
+    max-width: 60vw !important;
+    max-height: 60vh;
+    width: auto !important;
+}
+
 .sandboxslider-progress {
     position: absolute;
     justify-self: center !important;
