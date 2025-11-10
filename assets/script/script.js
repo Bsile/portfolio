@@ -1397,7 +1397,7 @@ function updateActiveChapter() {
   });
 
   if (activeSection) {
-    console.log(`🌟 Section active détectée : ${activeSection.id}`);
+    console.log(`Section active détectée : ${activeSection.id}`);
     // Désactive tous les chapitres avant d'activer celui en cours
     document.querySelectorAll('.chapter').forEach(chap => chap.classList.remove('active'));
 
@@ -1405,7 +1405,7 @@ function updateActiveChapter() {
     let activeLink = document.querySelector(`.sidebar-chapters-wrapper a[data-target="#${activeSection.id}"]`);
     if (activeLink) {
       activeLink.classList.add('active');
-      console.log(`✔️ Activation du chapitre : ${activeLink.textContent.trim()}`);
+      console.log(`Activation du chapitre : ${activeLink.textContent.trim()}`);
     }
   }
 }
