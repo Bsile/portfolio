@@ -6158,6 +6158,12 @@ span .three {
         padding: 4vw;
     }
 
+    .sandboxslider-item .cinema{
+    max-width: 65vw !important;
+    max-height: 60vh;
+    width: auto !important;
+    }
+
     .sandboxslider-item figure img,
     .sandboxslider-item figure video {
         max-width: 50vw;
@@ -6195,6 +6201,12 @@ span .three {
     .sandboxslider-item figure video {
         max-width: 75vw;
         max-height: 40vh;
+    }
+
+    .sandboxslider-item .cinema{
+    max-width: 75vw !important;
+    max-height: 60vh;
+    width: auto !important;
     }
 
     #extrapageview {
