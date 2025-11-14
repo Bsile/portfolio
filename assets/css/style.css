@@ -1828,7 +1828,7 @@ media-tooltip-content {
     transition: all ease 0.4s;
 }
 
-#work .box h5 {
+#work .box h4 {
     font-family: Inter;
     font-size: 1rem;
     font-weight: 400;
@@ -1839,7 +1839,7 @@ media-tooltip-content {
     transition: all ease 0.4s;
 }
 
-#work .box h6 {
+#work .box h5 {
     font-family: Inter;
     font-size: 1rem;
     font-weight: 400;
