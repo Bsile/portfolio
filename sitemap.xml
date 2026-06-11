@@ -1,26 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
-		<loc>http://basiler.fr/index.html</loc>
+		<loc>https://basiler.fr/index.html</loc>
 	</url>
 	<url>
-		<loc>http://basiler.fr/about.html</loc>
+		<loc>https://basiler.fr/about.html</loc>
 	</url>
 	<url>
-		<loc>http://basiler.fr/upreview.html</loc>
+		<loc>https://basiler.fr/upreview.html</loc>
 	</url>
 	<url>
-		<loc>http://basiler.fr/drime.html</loc>
+		<loc>https://basiler.fr/drime.html</loc>
 	</url>
 	<url>
-		<loc>http://basiler.fr/makebetter.html</loc>
+		<loc>https://basiler.fr/makebetter.html</loc>
 	</url>
 	<url>
-		<loc>http://basiler.fr/sandbox.html</loc>
-	</url>
-	<url>
-		<loc>http://basiler.fr/mentions-legales.html</loc>
-	</url>
-	<url>
-		<loc>http://basiler.fr/404.html</loc>
+		<loc>https://basiler.fr/sandbox.html</loc>
 	</url>
 </urlset>

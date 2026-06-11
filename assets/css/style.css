@@ -1,5 +1,14 @@
 /* Styles par défaut */
 
+/* Police Inter servie en local (variable 100–900) — plus de dépendance à Google Fonts */
+@font-face {
+    font-family: 'Inter';
+    src: url('../fonts/Inter-VariableFont.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 .inter-font {
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
@@ -7,6 +16,56 @@
     font-style: normal;
     font-variation-settings:
         "slnt" 0;
+}
+
+/* Lien d'évitement clavier : masqué jusqu'au focus */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 999999999;
+    padding: 12px 18px;
+    background: #090B0C;
+    color: #fff;
+    border-radius: 8px;
+    font-family: Inter, sans-serif;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    left: 12px;
+    top: 12px;
+}
+
+/* Titre h1 sémantique (SEO/accessibilité) sans impact visuel : retiré du flux et masqué */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Accessibilité clavier : contour de focus visible uniquement au clavier (pas à la souris) */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+[data-cal-link]:focus-visible {
+    outline: 2px solid var(--content);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* Appareils tactiles : on masque le curseur custom (sinon il se fige, faute de mousemove) */
+@media (hover: none) {
+    #mouse {
+        display: none !important;
+    }
 }
 
 * {
@@ -30,7 +89,7 @@ body:not(.dark-mode) {
     --border: #303030;
     --borderhover: #606060;
     --content: rgb(235, 233, 252, 1);
-    --contenttransparent: rgba(235, 233, 252, .5);
+    --contenttransparent: rgba(235, 233, 252, .6);
     --blurbg: rgba(219, 219, 219, .25);
     --contenthover: rgba(235, 233, 252, 0.01);
     --overlayon: rgba(0, 0, 0, 0.8);
@@ -55,7 +114,7 @@ body:not(.dark-mode) {
     --border: #c0c0c0;
     --borderhover: #909090;
     --content: rgb(5, 3, 21, 1);
-    --contenttransparent: rgba(5, 3, 21, 0.5);
+    --contenttransparent: rgba(5, 3, 21, 0.6);
     --blurbg: rgba(219, 219, 219, .25);
     --contenthover: rgba(5, 3, 21, 0.01);
     --overlayon: rgba(0, 0, 0, 0.8);
@@ -207,6 +266,14 @@ a:active {
     to {
         clip-path: inset(0% 0% 0% 0% round 10px);
     }
+}
+
+/* Fallback coins arrondis pour navigateurs SANS scroll-driven animations (Safari, Firefox) :
+   un clip-path statique arrondi reste fiable même avec un transform (parallaxe), contrairement
+   à border-radius + overflow qui peut "fuir" sous WebKit. Sur Chromium, l'animation ci-dessous
+   prend le relais (révélation au scroll). */
+.appeareffect {
+    clip-path: inset(0% 0% 0% 0% round 10px);
 }
 
 @supports (animation-timeline: view()) {
@@ -1152,6 +1219,8 @@ body {
 [data-media-player][data-layout=video]:not([data-fullscreen]) {
     border-radius: 10px !important;
     border: none !important;
+    /* clippe le poster ET la vidéo au rayon : sinon le haut des miniatures dépasse les coins arrondis */
+    overflow: hidden;
 }
 
 .vds-video-layout .vds-controls-group:nth-last-child(2) {
@@ -1219,8 +1288,12 @@ body {
     height: auto;
 }
 
-.vds-buffering-spinner {
-    display: none;
+/* On utilise notre propre spinner (.player-spinner) : on masque celui de Vidstack
+   dans tous les cas (wrapper + spinner), en forçant pour battre les styles Vidstack. */
+.vds-buffering-indicator,
+.vds-buffering-spinner,
+media-spinner {
+    display: none !important;
 }
 
 .vds-airplay-button {
@@ -3113,11 +3186,6 @@ span .three {
     border-radius: 10px;
 }
 
-.makebettercontextright {
-    width: calc(50% - 2.5vw);
-    height: 100%;
-}
-
 .makebettercentercolumnwrapper {
     display: flex;
     justify-content: space-between;
@@ -4054,11 +4122,6 @@ span .three {
     border-radius: 10px;
 }
 
-.drimecontextright {
-    width: calc(50% - 2.5vw);
-    height: 100%;
-}
-
 .drimecentercolumnwrapper {
     display: flex;
     justify-content: space-between;
@@ -4460,19 +4523,6 @@ span .three {
 #drimebtssection h5 span {
     color: var(--content);
     transition: all ease 0.4s;
-}
-
-.btsgallery {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2vw;
-}
-
-.btsgallery video {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 10px;
 }
 
 #drimesdsection {
@@ -4933,11 +4983,6 @@ span .three {
     object-fit: contain;
     aspect-ratio: auto !important;
     border-radius: 10px;
-}
-
-.upreviewcontextright {
-    width: calc(50% - 2.5vw);
-    height: 100%;
 }
 
 .upreviewcentercolumnwrapper {
@@ -5420,19 +5465,6 @@ span .three {
 #upreviewbtssection h5 span {
     color: var(--content);
     transition: all ease 0.4s;
-}
-
-.btsgallery {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2vw;
-}
-
-.btsgallery video {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 10px;
 }
 
 #upreviewsdsection {
@@ -6346,10 +6378,91 @@ span .three {
     }
 }
 
+/* Accessibilité : neutralise transitions/animations CSS si l'utilisateur le demande.
+   (Le smooth scroll Lenis est géré côté JS dans initializeLenis.) */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 @media screen and (max-width: 740px) {
 
     #error404 {
         padding-bottom: 25vh;
         margin: 0 5vw;
+    }
+}
+
+/* Vidstack : tant que le module n'a pas "défini" les custom elements, on masque
+   les icônes/contrôles bruts (slots SVG) qui sinon s'empilent. La poster/vidéo
+   de prévisualisation reste visible. */
+media-player:not(:defined) media-video-layout,
+media-player:not(:defined) media-toggle-button,
+media-video-layout:not(:defined),
+media-toggle-button:not(:defined) {
+    display: none !important;
+}
+
+media-player:not(:defined) {
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Indicateur de chargement au clic sur un player (cohérent dark/light via var(--content)).
+   .player-spinner est un overlay injecté en JS comme DERNIER enfant du <media-player>,
+   afin de passer au-dessus du media-poster (qui a son propre contexte d'empilement). */
+media-player {
+    position: relative;
+}
+
+.player-spinner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* voile sombre semi-transparent pour faire ressortir l'anneau ; il est AU-DESSUS du
+       poster (qui, lui, reste opaque et masque le chargement Vimeo) */
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 2147483000;
+    pointer-events: none;
+    /* fondu d'apparition/disparition du voile */
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+media-player.is-loading .player-spinner {
+    opacity: 1;
+}
+
+/* Pendant le chargement, on garde le poster (miniature) visible : il recouvre
+   l'iframe Vimeo (z-index supérieur), ce qui masque aussi le spinner interne de Vimeo. */
+media-player.is-loading :where(.vds-poster) {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+.player-spinner__ring {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--contenttransparent);
+    border-top-color: var(--content);
+    border-radius: 50%;
+    animation: reelspin 0.8s linear infinite;
+    /* légère ombre pour rester lisible par-dessus n'importe quelle miniature */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes reelspin {
+    to {
+        transform: rotate(360deg);
     }
 }

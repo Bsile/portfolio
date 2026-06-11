@@ -67,47 +67,54 @@ if (typeof window.lenis === 'undefined') {
 
 function initializeLenis() {
   if (window.lenis) {
-    window.lenis.destroy(); // Détruire l'ancienne instance de Lenis si elle existe
-    /*console.log('Lenis destroyed');*/
+    window.lenis.destroy(); // Détruire l'ancienne instance de Lenis (transitions Barba)
   }
 
-  // init lenis
+  // Respecte la préférence système « réduire les animations »
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // smoothWheel = bon nom d'option en Lenis 1.x ("smooth" n'existe pas et était ignoré).
+  // Le tactile reste natif (momentum natif = plus fluide sur mobile que le smooth simulé).
   window.lenis = new Lenis({
     lerp: 0.1,
-    smooth: true,
-  });
-
-  /*console.log('Lenis initialized');*/
-
-  const loop = (time) => {
-    window.lenis.raf(time);
-    requestAnimationFrame(loop);
-  };
-
-  requestAnimationFrame(loop);
-
-  window.lenis.on('scroll', (e) => {
-    /*console.log(e);*/
+    smoothWheel: !prefersReducedMotion,
   });
 
   window.lenis.on('scroll', ScrollTrigger.update);
 
-  gsap.ticker.add((time) => {
-    window.lenis.raf(time * 1000);
-  });
-
-  gsap.ticker.lagSmoothing(0);
-
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    const clickListener = function (e) {
-      e.preventDefault();
-      window.lenis.scrollTo(this.getAttribute('href'));
-    };
-
-    anchor.removeEventListener('click', clickListener);
-    anchor.addEventListener('click', clickListener);
-  });
+  // IMPORTANT : piloter Lenis avec UNE SEULE boucle, ajoutée une seule fois.
+  // Avant, chaque transition Barba empilait une boucle rAF + un gsap.ticker -> Lenis était
+  // piloté plusieurs fois par frame -> scroll saccadé, voire totalement figé.
+  if (!window._lenisTickerBound) {
+    gsap.ticker.add((time) => {
+      if (window.lenis) window.lenis.raf(time * 1000);
+    });
+    gsap.ticker.lagSmoothing(0);
+    window._lenisTickerBound = true;
+  }
 }
+
+// Scroll fluide des ancres internes : un seul écouteur délégué (attaché une fois,
+// survit aux transitions Barba, pas d'accumulation, gère aussi les futurs liens).
+if (!window._anchorScrollBound) {
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.length < 2) return;
+    // Toujours empêcher le saut natif vers l'ancre (c'est lui qui "téléporte" en haut
+    // et se bat avec le smooth scroll, ex. nav chapitres avec href="#main").
+    e.preventDefault();
+    // Si un onclick gère déjà le scroll (liens chapitres : onclick="lenis.scrollTo(...)"),
+    // on le laisse faire pour ne pas déclencher deux scrolls contradictoires.
+    const onclick = a.getAttribute('onclick') || '';
+    if (onclick.includes('scrollTo')) return;
+    const target = document.querySelector(href);
+    if (target && window.lenis) window.lenis.scrollTo(target);
+  });
+  window._anchorScrollBound = true;
+}
+
 initializeLenis();
 
 
@@ -317,7 +324,8 @@ function textOnHover(text) {
 
   switch (text) {
     case 'reel':
-      divTexte.textContent = 'Play';
+      // Texte dynamique : "Pause" si la vidéo joue, "Play" sinon (+ écoute des changements d'état)
+      setupReelCursorText();
       break;
     case 'project':
       divTexte.textContent = 'Voir';
@@ -1033,6 +1041,19 @@ class DragScroll {
   }
 
 
+  // Recalcule les largeurs (ex. après chargement d'images) SANS réinitialiser la position
+  recalc() {
+    if (!this.el || !this.wrap) return;
+    const savedProgress = this.progress;
+    const savedX = this.x;
+    this.wrapWidth = Array.from(this.items).reduce((t, item) => t + item.clientWidth, 0);
+    this.wrap.style.width = `${this.wrapWidth}px`;
+    this.maxScroll = this.wrapWidth - this.el.clientWidth;
+    // Restaure la position courante, bornée au nouveau maxScroll
+    this.progress = clamp(savedProgress, 0, this.maxScroll);
+    this.x = clamp(savedX, 0, this.maxScroll);
+  }
+
   handleWheel(e) {
     this.progress += e.deltaY;
     this.move();
@@ -1224,7 +1245,7 @@ const osInstance = OverlayScrollbars(document.querySelector('body'), {
 function reloadVidstackResources() {
   const themeLink = document.querySelector('link[href="https://cdn.vidstack.io/player/theme.css"]');
   const videoLink = document.querySelector('link[href="https://cdn.vidstack.io/player/video.css"]');
-  const playerScript = document.querySelector('script[src="https://cdn.vidstack.io/player"]');
+  const playerScript = document.querySelector('script[src="https://cdn.vidstack.io/player@1.15.5"]');
 
   if (themeLink) themeLink.remove();
   if (videoLink) videoLink.remove();
@@ -1237,7 +1258,7 @@ function reloadVidstackResources() {
 function loadPlayerScripts() {
   return new Promise((resolve, reject) => {
     // Check if the player script is already loaded
-    const existingScript = document.querySelector('script[src="https://cdn.vidstack.io/player"]');
+    const existingScript = document.querySelector('script[src="https://cdn.vidstack.io/player@1.15.5"]');
     const existingThemeCSS = document.querySelector('link[href="https://cdn.vidstack.io/player/theme.css"]');
     const existingVideoCSS = document.querySelector('link[href="https://cdn.vidstack.io/player/video.css"]');
 
@@ -1252,7 +1273,7 @@ function loadPlayerScripts() {
       if (!existingScript) {
         console.log('Loading Player.js script...');
         const script = document.createElement('script');
-        script.src = 'https://cdn.vidstack.io/player';
+        script.src = 'https://cdn.vidstack.io/player@1.15.5';
         script.type = 'module';
         script.onload = () => {
           console.log('Player.js script loaded successfully.');
@@ -1423,3 +1444,170 @@ function clearObserver() {
     console.log("Observer nettoyé.");
   }
 }
+
+
+/* ----------------------------------------------------------------------------
+   Curseur du showreel : affiche "Pause" quand la vidéo joue, "Play" sinon.
+   Appelé au survol de #reel (textOnHover('reel')) ; ré-interroge le lecteur à
+   chaque survol (il est recréé par Barba) et écoute play/pause pour un suivi live.
+---------------------------------------------------------------------------- */
+function setupReelCursorText() {
+  const reel = document.querySelector('#reel');
+  const hover = document.getElementById('hoverinteraction');
+  if (!hover) return;
+  const player = document.querySelector('#reel media-player');
+
+  const isPaused = () => {
+    if (player && typeof player.paused === 'boolean') return player.paused;
+    if (player && player.state && typeof player.state.paused === 'boolean') return player.state.paused;
+    return true; // par défaut : en pause -> "Play"
+  };
+  const apply = () => { hover.textContent = isPaused() ? 'Play' : 'Pause'; };
+
+  apply();
+
+  // Mise à jour live tant que le curseur survole le lecteur (une seule liaison par lecteur)
+  if (player && !player._reelCursorBound) {
+    const update = () => { if (reel && reel.matches(':hover')) apply(); };
+    player.addEventListener('play', update);
+    player.addEventListener('playing', update);
+    player.addEventListener('pause', update);
+    player._reelCursorBound = true;
+  }
+}
+
+
+/* ----------------------------------------------------------------------------
+   Hauteur de page & scroll : les images en lazy-load modifient la hauteur après
+   coup, ce qui fausse les bornes de Lenis / ScrollTrigger / DragScroll (sandbox).
+   On recalcule donc ces systèmes dès qu'une image ou vidéo finit de charger.
+---------------------------------------------------------------------------- */
+function refreshScrollSystems() {
+  try { if (window.lenis && window.lenis.resize) window.lenis.resize(); } catch (e) { }
+  try { if (window.ScrollTrigger && window.ScrollTrigger.refresh) window.ScrollTrigger.refresh(); } catch (e) { }
+  // DragScroll (slider horizontal sandbox) : recalcule les largeurs sans réinitialiser la position
+  try {
+    if (typeof scroll !== 'undefined' && scroll && typeof scroll.recalc === 'function') {
+      scroll.recalc();
+    }
+  } catch (e) { }
+}
+
+let _mediaRefreshTimer = null;
+function _scheduleScrollRefresh() {
+  clearTimeout(_mediaRefreshTimer);
+  _mediaRefreshTimer = setTimeout(refreshScrollSystems, 150);
+}
+
+// Écouteur délégué unique (le 'load' des <img>/<video> ne bulle pas -> phase de capture)
+document.addEventListener('load', (e) => {
+  const t = e.target;
+  if (t && (t.tagName === 'IMG' || t.tagName === 'VIDEO')) _scheduleScrollRefresh();
+}, true);
+
+// Filet de sécurité : recalcul une fois toutes les ressources chargées
+window.addEventListener('load', _scheduleScrollRefresh);
+
+
+/* ----------------------------------------------------------------------------
+   Cloudflare "Email Address Obfuscation" : Cloudflare remplace les emails par
+   <a class="__cf_email__" data-cfemail="..."> et les décode via son propre script
+   au chargement. En SPA (Barba), le contenu injecté lors d'une transition n'est
+   jamais re-décodé -> on relance le décodage nous-mêmes (même algo que Cloudflare).
+---------------------------------------------------------------------------- */
+function cfDecodeEmail(encoded) {
+  let email = '';
+  const key = parseInt(encoded.substr(0, 2), 16);
+  for (let n = 2; n < encoded.length; n += 2) {
+    email += String.fromCharCode(parseInt(encoded.substr(n, 2), 16) ^ key);
+  }
+  return email;
+}
+
+function decodeCfEmails(root) {
+  const scope = root || document;
+  scope.querySelectorAll('.__cf_email__[data-cfemail]').forEach((el) => {
+    try {
+      const email = cfDecodeEmail(el.getAttribute('data-cfemail'));
+      el.textContent = email;
+      if (el.tagName === 'A') el.setAttribute('href', 'mailto:' + email);
+      el.removeAttribute('data-cfemail');
+      el.classList.remove('__cf_email__');
+    } catch (e) { }
+  });
+  // Liens protégés type href="/cdn-cgi/l/email-protection#<hash>"
+  scope.querySelectorAll('a[href*="/cdn-cgi/l/email-protection#"]').forEach((el) => {
+    try {
+      const hash = el.getAttribute('href').split('#')[1];
+      if (!hash) return;
+      const email = cfDecodeEmail(hash);
+      el.setAttribute('href', 'mailto:' + email);
+      if (el.textContent.includes('[email')) el.textContent = email;
+    } catch (e) { }
+  });
+}
+
+// Décodage au chargement initial (filet de sécurité ; les transitions Barba sont gérées dans barba-transition.js)
+document.addEventListener('DOMContentLoaded', () => decodeCfEmails());
+
+
+/* ----------------------------------------------------------------------------
+   Indicateur de chargement sur les players Vidstack : au clic (event 'play'),
+   la vidéo (surtout Vimeo) peut mettre plusieurs secondes à démarrer. On affiche
+   un spinner (.is-loading) dès la demande de lecture, masqué quand ça joue vraiment.
+   Un délai de 180ms évite tout flash sur les vidéos qui démarrent instantanément.
+---------------------------------------------------------------------------- */
+function setupPlayerLoading(player) {
+  if (!player || player._loadingBound) return;
+  player._loadingBound = true;
+
+  // Overlay spinner injecté comme dernier enfant -> peint au-dessus du media-poster
+  if (!player.querySelector(':scope > .player-spinner')) {
+    const overlay = document.createElement('div');
+    overlay.className = 'player-spinner';
+    overlay.setAttribute('aria-hidden', 'true');
+    overlay.innerHTML = '<span class="player-spinner__ring"></span>';
+    player.appendChild(overlay);
+  }
+
+  const show = () => {
+    clearTimeout(player._loadTimer);
+    player._loadTimer = setTimeout(() => player.classList.add('is-loading'), 180);
+  };
+  const hide = () => {
+    clearTimeout(player._loadTimer);
+    player.classList.remove('is-loading');
+  };
+
+  player.addEventListener('play', show);     // lecture demandée (immédiat au clic)
+  player.addEventListener('waiting', show);  // re-buffering en cours de lecture
+  player.addEventListener('playing', hide);  // les images défilent réellement
+  player.addEventListener('can-play', hide);
+  player.addEventListener('pause', hide);
+  player.addEventListener('ended', hide);
+  player.addEventListener('error', hide);
+
+  // Curseur "Play"/"Pause" au survol de n'importe quel player (pas seulement le showreel)
+  const cursorUpdate = () => { if (player.matches(':hover')) updateCursorPlayPause(player); };
+  player.addEventListener('mouseenter', () => updateCursorPlayPause(player));
+  player.addEventListener('play', cursorUpdate);
+  player.addEventListener('playing', cursorUpdate);
+  player.addEventListener('pause', cursorUpdate);
+}
+
+// Met le texte du curseur (#hoverinteraction) à "Pause" si la vidéo joue, "Play" sinon
+function updateCursorPlayPause(player) {
+  const hover = document.getElementById('hoverinteraction');
+  if (!hover || !player) return;
+  let paused = true;
+  if (typeof player.paused === 'boolean') paused = player.paused;
+  else if (player.state && typeof player.state.paused === 'boolean') paused = player.state.paused;
+  hover.textContent = paused ? 'Play' : 'Pause';
+}
+
+function setupAllPlayersLoading(root) {
+  const scope = root || document;
+  scope.querySelectorAll('media-player').forEach(setupPlayerLoading);
+}
+
+document.addEventListener('DOMContentLoaded', () => setupAllPlayersLoading());

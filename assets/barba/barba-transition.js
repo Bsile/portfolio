@@ -163,6 +163,10 @@ barba.hooks.after((data) => {
   pageentrance();
   growOnHover(); // Réinitialiser les écouteurs d'événements après chaque transition
   initializeLenis(); // Réinitialiser Lenis après chaque transition
+  // Re-décoder les emails obfusqués par Cloudflare dans le contenu fraîchement injecté
+  if (typeof decodeCfEmails === 'function') decodeCfEmails(data.next && data.next.container);
+  // (Re)brancher l'indicateur de chargement sur les players de la nouvelle page
+  if (typeof setupAllPlayersLoading === 'function') setupAllPlayersLoading(data.next && data.next.container);
 });
 
 barba.hooks.afterEnter((data) => {
