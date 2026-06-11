@@ -2,39 +2,33 @@
 <html data-overlayscrollbars-initialize lang="fr">
 
 <head>
-    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Basile. R - Motion Designer</title>
-    <meta name="description"
-        content="Créateur passionné d’expériences motion innovantes, je façonne avec le cœur un avenir aux pixels uniques.">
 
+    <title>Page introuvable (404) | Basile. R</title>
+    <meta name="description" content="La page demandée n’existe pas ou a été déplacée. Revenez à l’accueil du portfolio de Basile R.">
 
-
+    <link rel="canonical" href="https://basiler.fr/404.html">
 
     <!-- Google / Search Engine Tags -->
-    <meta itemprop="name" content="Basile. R - Motion & Graphic Designer">
-    <meta itemprop="description"
-        content="Créateur passionné d’expériences motion innovantes, je façonne avec le cœur un avenir aux pixels uniques.">
+    <meta itemprop="name" content="Page introuvable — Basile. R">
+    <meta itemprop="description" content="La page demandée n’existe pas ou a été déplacée. Revenez à l’accueil du portfolio de Basile R.">
     <meta itemprop="image" content="https://basiler.fr/assets/images/index-meta.webp">
 
-    <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="https://basiler.fr">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:url" content="https://basiler.fr/404.html">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Basile. R - Motion & Graphic Designer">
-    <meta property="og:description"
-        content="Créateur passionné d’expériences motion innovantes, je façonne avec le cœur un avenir aux pixels uniques.">
+    <meta property="og:title" content="Page introuvable — Basile. R">
+    <meta property="og:description" content="La page demandée n’existe pas ou a été déplacée. Revenez à l’accueil du portfolio de Basile R.">
     <meta property="og:image" content="https://basiler.fr/assets/images/index-meta.webp">
 
-    <!-- Twitter Meta Tags -->
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Basile. R - Motion & Graphic Designer">
-    <meta name="twitter:description"
-        content="Créateur passionné d’expériences motion innovantes, je façonne avec le cœur un avenir aux pixels uniques.">
+    <meta name="twitter:title" content="Page introuvable — Basile. R">
+    <meta name="twitter:description" content="La page demandée n’existe pas ou a été déplacée. Revenez à l’accueil du portfolio de Basile R.">
     <meta name="twitter:image" content="https://basiler.fr/assets/images/index-meta.webp">
-
-
-
 
     <link rel="shortcut icon" href="assets/favicon/android-chrome-512x512.png" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
@@ -42,16 +36,17 @@
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
     <link rel="manifest" href="assets/favicon/site.webmanifest">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <script type="importmap">
+    {
+      "imports": {
+        "fscreen": "https://cdn.jsdelivr.net/npm/fscreen@1.2.0/+esm"
+      }
+    }
+    </script>
+    <link rel="preload" href="assets/fonts/Inter-VariableFont.woff2" as="font" type="font/woff2" crossorigin>
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-    </style>
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.css">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.css" integrity="sha384-aWjCoQWzMG6o+sx15PkZhgkV0dsuNvW7PBTwex1X3PXO3wIXrqU70AvBWfkQGK4E" crossorigin="anonymous">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=5586af94">
 
 
 
@@ -70,6 +65,7 @@
 </head>
 
 <body data-overlayscrollbars-initialize onload="onload()" data-barba="wrapper">
+    <a class="skip-link" href="#main">Aller au contenu principal</a>
 
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M5GDL29L" height="0" width="0"
@@ -110,7 +106,8 @@
     </script>
     <!-- Cal element-click embed code ends -->
 
-    <div id="main" data-barba="container" data-barba-namespace="error404">
+    <div id="main" data-barba="container" role="main" tabindex="-1" data-barba-namespace="error404">
+        <h1 class="visually-hidden">Page introuvable</h1>
         <div id="marge"></div>
         <div class="bggrid"></div>
 
@@ -187,7 +184,7 @@
                     </a>
                 </div>
                 <div id="darkmode">
-                    <a id="textlink" onmouseenter="textOnHover('dark')" onclick="darkmode()"><span
+                    <a id="textlink" onmouseenter="textOnHover('dark')" onclick="darkmode()" role="button" aria-label="Basculer le thème clair ou sombre"><span
                             class="darkcircle"></span></a>
                 </div>
                 <div id="legal1">
@@ -195,11 +192,11 @@
                         <h4>Mentions légales</h4>
                     </a>
                     <a id="textlink" onmouseenter="textOnHover('btn')"
-                        href="assets/files/CGU.pdf" target="_blank">
+                        href="assets/files/CGU.pdf" target="_blank" rel="noopener noreferrer">
                         <h4>CGU</h4>
                     </a>
                     <a id="textlink" onmouseenter="textOnHover('btn')"
-                        href="assets/files/CGV.pdf" target="_blank">
+                        href="assets/files/CGV.pdf" target="_blank" rel="noopener noreferrer">
                         <h4>CGV</h4>
                     </a>
                 </div>
@@ -208,7 +205,7 @@
                 <div id="socials">
                     <a id="textlink" onmouseenter="textOnHover('btn')"
                         href="https://wa.me/+33768338085"
-                        target="_blank">
+                        target="_blank" rel="noopener noreferrer">
                         <h2>WhatsApp <svg class="arrowiconbot" version="1.1" id="Calque_1"
                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
                                 y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;"
@@ -220,7 +217,7 @@
                             </svg></h2>
                     </a>
                     <a id="textlink" onmouseenter="textOnHover('btn')" href="https://www.linkedin.com/in/basile-r/"
-                        target="_blank">
+                        target="_blank" rel="noopener noreferrer">
                         <h2>LinkedIn <svg class="arrowiconbot" version="1.1" id="Calque_1"
                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
                                 y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;"
@@ -232,7 +229,7 @@
                             </svg></h2>
                     </a><br>
                     <a id="textlink" onmouseenter="textOnHover('btn')" href="https://www.instagram.com/bybasiler/"
-                        target="_blank">
+                        target="_blank" rel="noopener noreferrer">
                         <h2>Instagram <svg class="arrowiconbot" version="1.1" id="Calque_1"
                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
                                 y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;"
@@ -244,7 +241,7 @@
                             </svg></h2>
                     </a>
                     <a id="textlink" onmouseenter="textOnHover('btn')" href="https://x.com/bybasiler"
-                        target="_blank">
+                        target="_blank" rel="noopener noreferrer">
                         <h2>X <svg class="arrowiconbot" version="1.1" id="Calque_1" xmlns="http://www.w3.org/2000/svg"
                                 xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 20 20"
                                 style="enable-background:new 0 0 20 20;" xml:space="preserve">
@@ -257,11 +254,11 @@
                 </div>
                 <div id="legal2">
                     <a id="textlink" onmouseenter="textOnHover('btn')" href="https://github.com/Bsile/portfolio"
-                        target="_blank">
+                        target="_blank" rel="noopener noreferrer">
                         <h4>Code repo</h4>
                     </a>
                     <br>
-                    <h4>© 2025 legal</h4>
+                    <h4>© 2026 legal</h4>
                 </div>
             </div>
         </footer>
@@ -270,11 +267,11 @@
             <div id="line1">
                 
                 <div id="darkmode">
-                    <a class="footerdarkmode" onclick="darkmode()"><span class="darkcircle"></span></a>
+                    <a class="footerdarkmode" onclick="darkmode()" role="button" aria-label="Basculer le thème clair ou sombre"><span class="darkcircle"></span></a>
                 </div>
                 <div id="socials">
                     <a href="https://wa.me/+33768338085"
-                        target="_blank">
+                        target="_blank" rel="noopener noreferrer">
                         <h2>WhatsApp <svg class="arrowiconbot" version="1.1" id="Calque_1"
                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
                                 y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;"
@@ -285,7 +282,7 @@
                                 </g>
                             </svg></h2>
                     </a>
-                    <a href="https://www.linkedin.com/in/basile-r/" target="_blank">
+                    <a href="https://www.linkedin.com/in/basile-r/" target="_blank" rel="noopener noreferrer">
                         <h2>LinkedIn <svg class="arrowiconbot" version="1.1" id="Calque_1"
                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
                                 y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;"
@@ -296,7 +293,7 @@
                                 </g>
                             </svg></h2>
                     </a><br>
-                    <a href="https://www.instagram.com/bybasiler/" target="_blank">
+                    <a href="https://www.instagram.com/bybasiler/" target="_blank" rel="noopener noreferrer">
                         <h2>Instagram <svg class="arrowiconbot" version="1.1" id="Calque_1"
                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
                                 y="0px" viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;"
@@ -329,18 +326,18 @@
                     <a href="/mentions-legales.html">
                         <h4>Mentions légales</h4>
                     </a><br>
-                    <a href="assets/files/CGU.pdf" target="_blank">
+                    <a href="assets/files/CGU.pdf" target="_blank" rel="noopener noreferrer">
                         <h4>CGU</h4>
                     </a>
-                    <a href="assets/files/CGV.pdf" target="_blank">
+                    <a href="assets/files/CGV.pdf" target="_blank" rel="noopener noreferrer">
                         <h4>CGV</h4>
                     </a>
                 </div>
                 <div id="legal1">
-                    <a id="link" href="https://github.com/Bsile/portfolio" target="_blank">
+                    <a id="link" href="https://github.com/Bsile/portfolio" target="_blank" rel="noopener noreferrer">
                         <h4>Code source</h4>
                     </a>
-                    <h4>© 2025 legal</h4>
+                    <h4>© 2026 legal</h4>
                 </div>
 
             </div>
@@ -402,19 +399,19 @@
 
 
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha384-g4NTh/Iv5PPU4xPyhEWqPcwtNXOvdaDI8LLnyYfyNZOjKJeYQyjzQ9X5275eBjpt" crossorigin="anonymous"
         integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha384-Z3REaz79l2IaAZqJsSABtTbhjgOUYyV3p90XNnAPCSHg3EMTz1fouunq9WZRtj3d" crossorigin="anonymous"
         integrity="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.2.0/jquery.magnific-popup.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/lenis@1.0.45/dist/lenis.min.js" integrity="sha384-o3Jw8w4GQVg4a7wdJn3EY6OiObjk4e3VFa1VF4fEtDoIWnmdXuM1CkjpBS4zSKvU" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.2.0/jquery.magnific-popup.min.js" integrity="sha384-wVVS8+k4lj6Fb6yKFyaouEHfcfn8gNPYczmlw/HomGeeIMUb3Jt2JmTpXVmOxRI+" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/split-type"></script>
     <script src="https://unpkg.com/@barba/core"></script>
-    <script src="assets/script/script.js"></script>
-    <script src="assets/barba/barba-transition.js" type="module"></script>
+    <script src="assets/script/script.min.js?v=55a8d278"></script>
+    <script src="assets/barba/barba-transition.min.js?v=68297528" type="module"></script>
 </body>
 
 </html>
