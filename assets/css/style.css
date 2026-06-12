@@ -1296,14 +1296,6 @@ media-spinner {
     display: none !important;
 }
 
-/* Avec load="play", vidstack affiche un gros bouton play par-dessus la miniature tant que
-   la vidéo n'a pas démarré. On le masque pour garder la miniature designée propre :
-   le clic (geste vidstack) + le curseur "Play" suffisent. Les contrôles réapparaissent
-   pendant la lecture (player démarré). */
-media-player:not([data-started]) .vds-play-button {
-    display: none !important;
-}
-
 .vds-airplay-button {
     display: none;
 }
