@@ -1593,6 +1593,34 @@ function setupPlayerLoading(player) {
   player.addEventListener('play', cursorUpdate);
   player.addEventListener('playing', cursorUpdate);
   player.addEventListener('pause', cursorUpdate);
+
+  // Clic n'importe où dans le player -> play/pause. (Les gestes natifs vidstack sont désactivés
+  // en CSS car ils ne déclenchent pas le chargement avec load="play" et diffèrent souris/tactile.)
+  // On laisse passer les vrais contrôles (boutons, sliders, menus) pour ne pas double-déclencher.
+  player.addEventListener('click', (e) => {
+    // Laisse passer les vrais contrôles vidstack (boutons custom .vds-button, sliders, menus)
+    if (e.target.closest('.vds-button, .vds-slider, .vds-controls-group, .vds-menu, media-menu, [role="slider"], [role="menuitem"], button, a, input, select')) return;
+    try {
+      if (player.paused) player.play(); else player.pause();
+    } catch (err) { }
+  });
+
+  // Curseur : sur les CONTRÔLES (icônes play/volume/fullscreen + slider de volume) -> état "bouton"
+  // (curseur qui inverse, sans texte) ; sur le reste du player -> "Play"/"Pause".
+  // mouseover bubble -> on détecte dynamiquement la cible (uniquement les icônes, pas le conteneur).
+  player.addEventListener('mouseover', (e) => {
+    const cursorEl = document.querySelector('#mouse');
+    if (!cursorEl || typeof TweenMax === 'undefined') return;
+    const cursorTxt = document.querySelector('#hoverinteraction');
+    if (e.target.closest('.vds-button, .vds-slider')) {
+      TweenMax.to(cursorEl, 0.3, { scale: 1 });
+      TweenMax.to(cursorEl, 0, { backdropFilter: 'invert(1) grayscale(1)', backgroundColor: 'var(--contenthover)' });
+      if (cursorTxt) TweenMax.to(cursorTxt, 0.2, { scale: 0 });
+    } else {
+      TweenMax.to(cursorEl, 0, { backdropFilter: 'none', backgroundColor: 'var(--content)' });
+      if (cursorTxt) TweenMax.to(cursorTxt, 0.2, { scale: 1 });
+    }
+  });
 }
 
 // Met le texte du curseur (#hoverinteraction) à "Pause" si la vidéo joue, "Play" sinon

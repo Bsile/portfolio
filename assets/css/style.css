@@ -1302,9 +1302,27 @@ media-player {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    /* poster vidstack sans fond noir : laisse voir le background du player (case studies)
+       ou la 1re frame de la vidéo locale (sound design), au lieu d'un rectangle noir. */
+    --media-poster-bg: transparent;
 }
 
-[data-media-player] .vds-poster {
+/* Gestes natifs vidstack désactivés : on gère le clic-pour-lire nous-mêmes en JS, de façon
+   uniforme souris + tactile (les gestes vidstack ne déclenchent pas le chargement avec
+   load="play" et désactivent le clic-play sur tactile). Le clic sur tout le player lance la vidéo. */
+[data-media-player] .vds-gesture {
+    display: none !important;
+}
+
+/* Une fois la vidéo lancée (data-started), on ne réaffiche JAMAIS la miniature ni le bouton
+   "démarrer" : évite le flash de miniature à la reprise après pause / au bouclage (loop),
+   et le doublon de bouton play pendant la transition miniature -> vidéo. */
+[data-media-player][data-started] {
+    background-image: none !important;
+}
+
+[data-media-player][data-started] .vds-poster,
+[data-media-player][data-started] .vds-load-container {
     display: none !important;
 }
 
@@ -6458,6 +6476,12 @@ media-player {
 
 media-player.is-loading .player-spinner {
     opacity: 1;
+}
+
+/* Une fois la vidéo lancée, on ne réaffiche plus notre loader (voile sombre + spinner) :
+   le chargement initial est couvert, ensuite on laisse vidstack/Vimeo gérer le re-buffering/loop. */
+media-player[data-started] .player-spinner {
+    opacity: 0 !important;
 }
 
 /* Pendant le chargement, on garde le poster (miniature) visible : il recouvre
