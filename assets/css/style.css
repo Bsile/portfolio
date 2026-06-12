@@ -3,7 +3,7 @@
 /* Police Inter servie en local (variable 100–900) — plus de dépendance à Google Fonts */
 @font-face {
     font-family: 'Inter';
-    src: url('../fonts/Inter-VariableFont.woff2') format('woff2');
+    src: url('../fonts/Inter-Variable.woff2') format('woff2');
     font-weight: 100 900;
     font-style: normal;
     font-display: swap;
@@ -1293,6 +1293,14 @@ body {
 .vds-buffering-indicator,
 .vds-buffering-spinner,
 media-spinner {
+    display: none !important;
+}
+
+/* Avec load="play", vidstack affiche un gros bouton play par-dessus la miniature tant que
+   la vidéo n'a pas démarré. On le masque pour garder la miniature designée propre :
+   le clic (geste vidstack) + le curseur "Play" suffisent. Les contrôles réapparaissent
+   pendant la lecture (player démarré). */
+media-player:not([data-started]) .vds-play-button {
     display: none !important;
 }
 
