@@ -44,6 +44,8 @@
     }
     </script>
     <link rel="preload" href="assets/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Préchargement de l'élément LCP mobile (1re vignette projet) pour accélérer son affichage -->
+    <link rel="preload" as="image" href="assets/images/upreviewthumb.webp" fetchpriority="high">
 
     <!-- Accélère le démarrage de la vidéo Vimeo du showreel (connexion anticipée) -->
     <link rel="preconnect" href="https://player.vimeo.com" crossorigin>
@@ -165,7 +167,7 @@
                         <div id="avatar">
                             <div id="avatarcenter">
 
-                                <img id="pp" src="assets/images/photodeprofil.webp" alt="photo de profil" fetchpriority=high>
+                                <img id="pp" src="assets/images/photodeprofil-320.webp" width="320" height="320" alt="photo de profil">
 
                             </div>
                         </div>
@@ -347,7 +349,7 @@
                 <a class="box" onmouseenter="textOnHover('project')" onclick="changeText('drime')" id="link"
                     href="drime.html">
                     <div id="cover">
-                        <img src="assets/images/drimethumb.webp" alt="Drime" fetchpriority=high>
+                        <img src="assets/images/drimethumb.webp" alt="Drime" loading="lazy">
                     </div>
                     <div id="desc">
                         <h3>Drime</h3>
@@ -360,7 +362,7 @@
                 <a class="box" onmouseenter="textOnHover('project')" onclick="changeText('makebetter')" id="link"
                     href="makebetter.html">
                     <div id="cover">
-                        <img src="assets/images/makebetterthumb.webp" alt="MakeBetter" fetchpriority=high>
+                        <img src="assets/images/makebetterthumb.webp" alt="MakeBetter" loading="lazy">
                     </div>
                     <div id="desc">
                         <h3>MakeBetter</h3>
