@@ -1913,6 +1913,7 @@ media-tooltip-content {
 .box img {
     position: relative;
     width: 100%;
+    height: auto;
     z-index: 99;
     object-fit: contain;
     pointer-events: none;
