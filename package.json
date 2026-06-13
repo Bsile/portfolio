@@ -7,7 +7,7 @@
     "build:css": "esbuild assets/css/style.css --minify --outfile=assets/css/style.min.css",
     "build:js": "esbuild assets/script/script.js --minify-whitespace --minify-syntax --drop:console --outfile=assets/script/script.min.js",
     "build:barba": "esbuild assets/barba/barba-transition.js --minify-whitespace --minify-syntax --drop:console --outfile=assets/barba/barba-transition.min.js",
-    "build": "npm run build:css && npm run build:js && npm run build:barba && node cache-bust.mjs"
+    "build": "npm run build:css && npm run build:js && npm run build:barba && node cache-bust.mjs && node inline-css.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.24.0"
