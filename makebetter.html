@@ -44,13 +44,24 @@
     }
     </script>
     <link rel="preload" href="assets/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <!-- CSS Swiper (slider) : non-bloquant (slider sous la ligne de flottaison, initialisé en JS) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" /></noscript>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.css" integrity="sha384-aWjCoQWzMG6o+sx15PkZhgkV0dsuNvW7PBTwex1X3PXO3wIXrqU70AvBWfkQGK4E" crossorigin="anonymous">
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/2.9.2/styles/overlayscrollbars.min.css" integrity="sha384-LUP9kIdti2cDjdWYUQjG6BXpPrGBRu/mRxQPPac+C3JDjmRdSK6tQ2Q6jM3tYzEw" crossorigin="anonymous" />
-    <link rel="stylesheet" href="https://cdn.vidstack.io/player/theme.css" />
-    <link rel="stylesheet" href="https://cdn.vidstack.io/player/video.css" />
+    <!-- CSS de la lightbox : non-bloquant (utile seulement au clic sur une image) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.css" integrity="sha384-aWjCoQWzMG6o+sx15PkZhgkV0dsuNvW7PBTwex1X3PXO3wIXrqU70AvBWfkQGK4E" crossorigin="anonymous" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.css" integrity="sha384-aWjCoQWzMG6o+sx15PkZhgkV0dsuNvW7PBTwex1X3PXO3wIXrqU70AvBWfkQGK4E" crossorigin="anonymous"></noscript>
+    <!-- Anti-FOUC OverlayScrollbars inliné (masque la scrollbar native avant l'init JS) pour charger le CSS complet en non-bloquant sans flash -->
+    <style>[data-overlayscrollbars-initialize],[data-overlayscrollbars-viewport~=scrollbarHidden]{scrollbar-width:none!important}[data-overlayscrollbars-initialize]::-webkit-scrollbar,[data-overlayscrollbars-initialize]::-webkit-scrollbar-corner,[data-overlayscrollbars-viewport~=scrollbarHidden]::-webkit-scrollbar,[data-overlayscrollbars-viewport~=scrollbarHidden]::-webkit-scrollbar-corner{-webkit-appearance:none!important;appearance:none!important;display:none!important;height:0!important;width:0!important}[data-overlayscrollbars-initialize]:not([data-overlayscrollbars]):not(html):not(body){overflow:auto}</style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/2.9.2/styles/overlayscrollbars.min.css" integrity="sha384-LUP9kIdti2cDjdWYUQjG6BXpPrGBRu/mRxQPPac+C3JDjmRdSK6tQ2Q6jM3tYzEw" crossorigin="anonymous" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/2.9.2/styles/overlayscrollbars.min.css" integrity="sha384-LUP9kIdti2cDjdWYUQjG6BXpPrGBRu/mRxQPPac+C3JDjmRdSK6tQ2Q6jM3tYzEw" crossorigin="anonymous" /></noscript>
+    <!-- CSS du player vidstack : non-bloquant (players sous la ligne de flottaison) -->
+    <link rel="stylesheet" href="https://cdn.vidstack.io/player/theme.css" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://cdn.vidstack.io/player/video.css" media="print" onload="this.media='all'" />
+    <noscript>
+        <link rel="stylesheet" href="https://cdn.vidstack.io/player/theme.css" />
+        <link rel="stylesheet" href="https://cdn.vidstack.io/player/video.css" />
+    </noscript>
     <link rel="stylesheet" href="assets/css/style.min.css?v=8a043555">
 
 
