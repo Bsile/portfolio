@@ -115,6 +115,18 @@ if (!window._anchorScrollBound) {
   window._anchorScrollBound = true;
 }
 
+// Liens Cal.com (bouton Contact) : l'embed Cal ouvre la modale au clic mais ne bloque
+// pas la navigation native. Les liens gardent un href de repli (cal.com) pour le cas
+// sans JS ; quand JS tourne, on annule la navigation pour conserver l'overlay.
+// Écouteur délégué unique -> survit aux transitions Barba.
+if (!window._calLinkBound) {
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[data-cal-link]');
+    if (a) e.preventDefault();
+  });
+  window._calLinkBound = true;
+}
+
 initializeLenis();
 
 
