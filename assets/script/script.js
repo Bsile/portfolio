@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', function () {
   function isUpreviewPage() {
     return window.location.pathname.endsWith('upreview.html');
   }
+  function isAdsPage() {
+    return window.location.pathname.endsWith('ads.html');
+  }
 
   if (isHomePage()) {
     popupvimeo();
@@ -53,6 +56,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
   if (isUpreviewPage()) {
     initParallax();
+  }
+
+  if (isAdsPage()) {
+    initAds();
   }
 });
 
@@ -388,6 +395,9 @@ function changeText(text) {
     case 'legal':
       divTexte.textContent = 'Mentions légales';
       break;
+    case 'ads':
+      divTexte.textContent = 'Ads collection';
+      break;
     default:
       break;
   }
@@ -441,6 +451,9 @@ function introanimation() {
   tl.to("#loader", {
     display: "none"
   })
+  // clearProps CIBLÉ sur les players v10 uniquement (fix Safari : retire leur transform résiduel).
+  // PAS sur tous les .intro1 : ça cassait le bloc-conteneur des absolus (barre de progression sandbox -> bas de page).
+  tl.set(".v10-player", { clearProps: "transform" })
 }
 introanimation()
 
@@ -466,6 +479,7 @@ function pageentrance() {
     duration: 1.1,
     ease: "expo.inOut",
   }, 'start');
+  tl.set(".v10-player", { clearProps: "transform" });  // clearProps CIBLÉ v10 (fix Safari), pas tous les .intro1 (cf. sandbox)
   tl.delay(0.1);
 }
 
@@ -970,6 +984,736 @@ function cleanupParallax() {
 }
 
 
+/* ===================== ADS COLLECTION (ads.html) ===================== */
+
+/* ---- Interrupteurs (un seul mot à changer, puis `npm run build`) ----
+   ADS_CROSSFADE_MS : fondu entre deux créas dans la modale. **0 = désactivé**,
+     état actuel. Testé sur iPhone le 2026-07-30 et rejeté : la couche de fondu
+     est insérée SOUS le panneau bas, qui porte un `backdrop-filter: blur(30px)`
+     → iOS recompose son arrière-plan à l'insertion puis au retrait de la
+     couche, d'où un flash au niveau du panneau. Non reproductible en Chrome
+     (compositing propre à iOS), donc non corrigeable à l'aveugle depuis ici.
+     Le code reste derrière l'interrupteur : pour réessayer il faudrait une
+     couche PERMANENTE dans le DOM (aucune insertion/retrait, donc aucune
+     recomposition) ou une couche clippée pour ne jamais passer sous le panneau.
+   ADS_PANEL_PERF   : contain + will-change sur le panneau bas mobile.
+     **false = désactivé**, état actuel. Reculé le 2026-07-30 : le glissé du
+     panneau a été rapporté saccadé pendant que ces règles étaient actives, et
+     `will-change: transform` sur un élément qui porte DÉJÀ un
+     `backdrop-filter` peut coûter plus qu'il ne rapporte. Retour à la
+     référence connue avant de retenter autre chose. */
+const ADS_CROSSFADE_MS = 0;
+const ADS_PANEL_PERF = false;
+
+let _adsCards = [];
+let _adsCurrentIndex = -1;
+let _adsMoveHandlers = [];
+let _adsVideoHandlers = [];
+let _adsModalHandlers = [];
+let _adsDocBound = false;
+let _adsThumbAnim = false;
+let _adsPreviewObserver = null;   // autoplay des previews vidéo de la galerie quand elles sont visibles
+let _adsResizeHandler = null;     // recalcul de la safe-area au resize/orientation
+let _adsThumbRaf = null;          // animation de snap du carrousel (rAF), annulable
+
+// Décalage vertical des contrôles du player : ils se posent 10px au-dessus du
+// panneau de détails et le suivent. La valeur = px de détails révélés (+ rebond).
+// Lue par le CSS injecté dans le shadow des players de la modale (ADS_CTRL_CSS) :
+// les propriétés personnalisées franchissent la frontière du shadow DOM.
+function adsSetCtrlShift(modal, px) {
+  if (modal) modal.style.setProperty('--ads-ctrl-shift', (px || 0) + 'px');
+}
+
+// Remet le bottom-sheet (détails) replié, instantanément (sans transition)
+function adsResetSheet(modal) {
+  const info = modal.querySelector('.adsmodal-info');
+  const details = modal.querySelector('.adsmodal-details');
+  if (info) { info.style.setProperty('--sheet', '0'); info.style.transform = ''; info.classList.remove('is-dragging'); }
+  // Contrôles remis à leur place basse sans animation, comme les détails.
+  modal.style.setProperty('--ads-ctrl-dur', '0s');
+  adsSetCtrlShift(modal, 0);
+  if (details) {
+    details.style.transition = 'none';
+    details.style.height = '0px';
+    void details.offsetHeight; // reflow → applique le 0 sans animation
+    details.style.transition = '';
+  }
+  requestAnimationFrame(() => modal.style.removeProperty('--ads-ctrl-dur'));
+}
+
+// Position du ✕ en plein écran mobile. env(safe-area-inset-top) est peu fiable sur
+// iOS (il rapporte 0 par intermittence selon l'état de la toolbar), donc on détecte
+// les iPhone à encoche / dynamic island (UA + ratio d'écran > 2) et on pose une
+// valeur fixe ; sur les autres appareils on la retire et le CSS retombe sur env().
+//
+// 15px = même écart en haut qu'à droite (`right: 15px`), demandé par l'utilisateur :
+// à 40px le retrait du haut faisait presque le triple de celui de droite, le ✕ ne
+// lisait pas comme posé dans le coin. ⚠️ À 15px le ✕ (37px de haut, donc y = 15→52)
+// croise la bande où iOS dessine l'heure et la batterie (y ≈ 17→30) : il est à
+// droite donc jamais sous la dynamic island, mais il passe sous l'indicateur de
+// batterie. Si ça gêne à l'usage, 34px est la valeur la plus haute qui dégage
+// complètement la barre de statut. Seul nombre à toucher.
+//
+// Il n'y a plus de --ads-safe-min : le voile dégradé du haut a été retiré le
+// 2026-07-30 (la créa monte jusqu'au bord de l'écran), c'était son seul usage.
+function adsSetSafeMin() {
+  const s = window.screen || {};
+  const ratio = (s.width && s.height) ? Math.max(s.width, s.height) / Math.min(s.width, s.height) : 0;
+  const notched = /iPhone|iPod/.test(navigator.userAgent) && ratio > 2;
+  if (notched) document.documentElement.style.setProperty('--ads-close-top', '15px');
+  else document.documentElement.style.removeProperty('--ads-close-top');
+}
+
+// Mesure la hauteur du panneau REPLIÉ (détails exclus) et la pose en --ads-sheet-h
+// sur la modale. La créa mobile s'en sert pour se centrer sur la zone visible
+// (au-dessus du panneau replié). En soustrayant la hauteur des détails, la valeur
+// reste CONSTANTE même panneau déployé → la créa ne bouge pas quand on ouvre les
+// détails, le panneau la recouvre simplement davantage.
+// Le prolongement du panneau sous l'écran est un ::after (position:absolute), donc
+// il n'entre pas dans offsetHeight : la mesure reste juste.
+function adsSyncSheetHeight() {
+  const modal = document.getElementById('adsmodal');
+  if (!modal) return;
+  const info = modal.querySelector('.adsmodal-info');
+  const details = modal.querySelector('.adsmodal-details');
+  if (!info) return;
+  const h = info.offsetHeight - (details ? details.offsetHeight : 0);
+  if (h > 0) modal.style.setProperty('--ads-sheet-h', h + 'px');
+}
+
+// Position de scroll qui met une vignette pile au centre du carrousel.
+function adsThumbScrollTarget(wrap, el) {
+  return Math.round(el.offsetLeft + el.offsetWidth / 2 - wrap.clientWidth / 2);
+}
+
+// Anime scrollLeft du carrousel jusqu'à `to` (scrollLeft n'est pas animable en CSS).
+// Easing out-quart : départ franc, atterrissage long et doux, le ressenti d'une
+// inertie qui se pose, cohérent avec les autres mouvements du site. Durée
+// proportionnelle à la distance (bornée) pour qu'un petit ajustement reste vif.
+// _adsThumbAnim suspend le settle au scroll pendant l'animation.
+function adsAnimateThumbs(wrap, to, done) {
+  if (_adsThumbRaf) { cancelAnimationFrame(_adsThumbRaf); _adsThumbRaf = null; }
+  const from = wrap.scrollLeft;
+  const dist = to - from;
+  const finish = () => { _adsThumbRaf = null; _adsThumbAnim = false; if (done) done(); };
+  if (Math.abs(dist) < 1 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    wrap.scrollLeft = to;
+    finish();
+    return;
+  }
+  const dur = Math.min(420, Math.max(180, Math.abs(dist) * 1.1));
+  const t0 = performance.now();
+  _adsThumbAnim = true;
+  const step = (t) => {
+    const p = Math.min(1, (t - t0) / dur);
+    wrap.scrollLeft = from + dist * (1 - Math.pow(1 - p, 4));
+    if (p < 1) _adsThumbRaf = requestAnimationFrame(step);
+    else finish();
+  };
+  _adsThumbRaf = requestAnimationFrame(step);
+}
+
+function adsSetCardLight(card, e) {
+  const r = card.getBoundingClientRect();
+  card.style.setProperty('--mx', ((e.clientX - r.left) / r.width) * 100 + '%');
+  card.style.setProperty('--my', ((e.clientY - r.top) / r.height) * 100 + '%');
+}
+
+function adsCloseCta() {
+  const cta = document.querySelector('.cta.open');
+  if (!cta) return;
+  cta.classList.remove('open');
+  const trigger = cta.querySelector('.cta-trigger');
+  if (trigger) trigger.setAttribute('aria-expanded', 'false');
+}
+
+function adsOpenModal(index, thumbMode) {
+  const modal = document.getElementById('adsmodal');
+  const card = _adsCards[index];
+  if (!modal || !card) return;
+  const wasOpen = modal.classList.contains('open');
+  const prevCard = _adsCurrentIndex >= 0 ? _adsCards[_adsCurrentIndex] : null;
+  _adsCurrentIndex = index;
+  // Retire le focus (et l'outline navigateur) de la card cliquée derrière la modale
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  const d = card.dataset;
+
+  modal.querySelector('.adsmodal-brandname').textContent = d.brand || '';
+  const dot = modal.querySelector('.adsmodal-brand-dot');
+  if (dot) dot.style.background = d.accent || 'var(--content)';
+  modal.querySelectorAll('.adsmodal-v').forEach((el) => {
+    el.textContent = d[el.dataset.field] || 'Non précisé';
+  });
+
+  const tagWrap = modal.querySelector('.adsmodal-tags');
+  tagWrap.innerHTML = '';
+  (d.tags || '').split(',').map((t) => t.trim()).filter(Boolean).forEach((t) => {
+    const s = document.createElement('span');
+    s.className = 'adtag';
+    s.textContent = t;
+    tagWrap.appendChild(s);
+  });
+
+  const stage = modal.querySelector('.adsmodal-creative');
+
+  // Fondu entre créas : on fige la créa sortante en une simple <img> (son poster)
+  // qu'on garde AU-DESSUS de la nouvelle, puis on la dissout. La nouvelle est déjà
+  // opaque dessous → aucune latence ajoutée et aucun flash de fond, contrairement
+  // à un fade-out puis fade-in. Le poster suffit : sur 140 ms, l'écart avec la
+  // frame vidéo en cours est imperceptible. Rollback : ADS_CROSSFADE_MS = 0.
+  const fadePoster = prevCard && prevCard !== card ? (prevCard.dataset.poster || prevCard.dataset.src) : null;
+  const doFade = ADS_CROSSFADE_MS > 0 && wasOpen && fadePoster
+    && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (window.V10) V10.cleanup();            // démonte le player v10 de la créa précédente
+  stage.classList.remove('v10-player');
+  stage.innerHTML = '';
+  stage.style.background = d.accent || 'var(--box)';
+  if (d.type === 'video' && d.src) {
+    // Player Video.js v10 (HLS auto-hébergé) dans <video-player><video-skin>, même système que les héros.
+    stage.classList.add('v10-player');
+    const player = document.createElement('video-player');
+    const skin = document.createElement('video-skin');
+    const media = document.createElement('hlsjs-video');
+    media.setAttribute('src', d.src);        // master.m3u8
+    media.setAttribute('playsinline', '');
+    media.setAttribute('loop', '');
+    if (d.vtt) {                              // storyboard : miniatures au survol de la barre de progression
+      const track = document.createElement('track');
+      track.setAttribute('kind', 'metadata');
+      track.setAttribute('src', d.vtt);
+      track.setAttribute('default', '');
+      media.appendChild(track);
+    }
+    skin.appendChild(media);
+    if (d.poster) {
+      const poster = document.createElement('media-poster');
+      const pimg = document.createElement('img');  // v10 rend le poster via son CONTENU (enfant), pas l'attribut src
+      pimg.src = d.poster;
+      pimg.alt = '';
+      poster.appendChild(pimg);
+      skin.appendChild(poster);
+    }
+    player.appendChild(skin);
+    stage.appendChild(player);
+    if (window.V10) V10.init(modal);         // monte le player v10 de la modale (+ pause auto des autres)
+  } else if (d.src) {
+    const img = document.createElement('img');
+    img.src = d.src;
+    img.alt = d.brand ? 'Créa publicitaire ' + d.brand : 'Créa publicitaire';
+    stage.appendChild(img);
+  }
+
+  if (doFade) {
+    const out = document.createElement('img');
+    out.className = 'adsmodal-fade';        // absolute inset:0, z-index 1, pointer-events:none
+    out.src = fadePoster;
+    out.alt = '';
+    stage.appendChild(out);
+    // Web Animations plutôt qu'une transition CSS : la durée reste définie au seul
+    // endroit qui compte (ADS_CROSSFADE_MS) et le nettoyage est branché sur finished.
+    const anim = out.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ADS_CROSSFADE_MS, easing: 'linear' });
+    anim.finished.then(() => out.remove(), () => out.remove());
+  }
+
+  // Carrousel mobile (boucle infinie) : marque toutes les copies de la vignette
+  // active. Recentrage selon le mode :
+  //  - 'skip'   : pas de scroll (scroll-settle ; clic déjà géré à part)
+  //  - 'smooth' : scroll animé vers la copie la plus proche (swipe créa, flèches)
+  //  - défaut   : centre la copie du milieu, instantané (ouverture fraîche)
+  const wrap = modal.querySelector('.adsmodal-thumbs');
+  const thumbs = wrap ? wrap.querySelectorAll('.adsthumb') : [];
+  const nThumbs = _adsCards.length;
+  thumbs.forEach((t) => t.classList.toggle('active', parseInt(t.dataset.idx, 10) === index));
+  if (thumbMode !== 'skip' && thumbs.length) {
+    if (thumbMode === 'smooth') {
+      // Suspend le saut de boucle le temps de l'animation, puis anime vers la
+      // copie de `index` la plus proche du centre (≈ un pas pour un swipe ±1).
+      _adsThumbAnim = true;
+      const mid = wrap.getBoundingClientRect().left + wrap.clientWidth / 2;
+      let target = null, bd = Infinity;
+      thumbs.forEach((t) => {
+        if (parseInt(t.dataset.idx, 10) !== index) return;
+        const r = t.getBoundingClientRect();
+        const dd = Math.abs(r.left + r.width / 2 - mid);
+        if (dd < bd) { bd = dd; target = t; }
+      });
+      if (target) adsAnimateThumbs(wrap, adsThumbScrollTarget(wrap, target));
+      else _adsThumbAnim = false;
+    } else {
+      const target = thumbs[nThumbs + index] || thumbs[index];
+      if (target) target.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
+    }
+  }
+
+  if (wasOpen) {
+    // Switch de créa (panneau déjà ouvert) : réajuste la hauteur du panneau à la
+    // hauteur du nouveau contenu, animée par la transition CSS (les détails
+    // peuvent différer d'une créa à l'autre).
+    const infoEl = modal.querySelector('.adsmodal-info');
+    const detailsEl = modal.querySelector('.adsmodal-details');
+    const innerEl = modal.querySelector('.adsmodal-details-inner');
+    if (infoEl && detailsEl && innerEl) {
+      const p = parseFloat(infoEl.style.getPropertyValue('--sheet')) || 0;
+      if (p > 0) {
+        const revele = p * innerEl.offsetHeight;
+        detailsEl.style.height = revele + 'px';
+        adsSetCtrlShift(modal, revele);   // les contrôles suivent la nouvelle hauteur
+      }
+    }
+  } else {
+    // Ouverture "fraîche" : détails repliés
+    adsResetSheet(modal);
+  }
+
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.documentElement.classList.add('ads-modal-open');
+  document.body.classList.add('ads-modal-open');
+  if (window.lenis) window.lenis.stop();
+  // Mesure la zone visible (mobile) une fois la modale posée : la créa s'y centre.
+  if (!wasOpen) requestAnimationFrame(adsSyncSheetHeight);
+}
+
+// Peuple le carrousel de vignettes (une par créa), mobile only.
+// 3 copies identiques → carrousel en boucle (ni début ni fin visibles). Chaque
+// vignette porte data-idx = index de la vraie créa.
+function adsBuildThumbs() {
+  const wrap = document.querySelector('#adsmodal .adsmodal-thumbs');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const make = (i) => {
+    const d = _adsCards[i].dataset;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'adsthumb';
+    b.dataset.idx = i;
+    b.setAttribute('aria-label', 'Voir la créa ' + (i + 1));
+    if (d.poster) {
+      const img = document.createElement('img');
+      img.src = d.poster;
+      img.alt = '';
+      img.loading = 'lazy';
+      b.appendChild(img);
+    } else if (d.accent) {
+      b.style.background = d.accent;
+    }
+    b.addEventListener('click', () => {
+      // Tap (pas un drag) : la créa s'ouvre tout de suite (geste explicite, on
+      // veut la réponse immédiate) et le carrousel recentre la vignette en
+      // parallèle. _adsThumbAnim suspend le saut de boucle pendant l'animation.
+      adsOpenModal(i, 'skip');
+      adsAnimateThumbs(wrap, adsThumbScrollTarget(wrap, b));
+    });
+    return b;
+  };
+  for (let copy = 0; copy < 3; copy++) {
+    for (let i = 0; i < _adsCards.length; i++) wrap.appendChild(make(i));
+  }
+}
+
+function adsCloseModal() {
+  const modal = document.getElementById('adsmodal');
+  if (!modal) return;
+  // Coupe un snap de carrousel en cours (sinon le rAF survit à la fermeture et
+  // à la transition Barba). cleanupAds() passe aussi par ici.
+  if (_adsThumbRaf) { cancelAnimationFrame(_adsThumbRaf); _adsThumbRaf = null; }
+  _adsThumbAnim = false;
+  const stage = modal.querySelector('.adsmodal-creative');
+  if (stage) {
+    if (window.V10) V10.cleanup();           // démonte + stoppe le player v10 s'il y en a un
+    stage.classList.remove('v10-player');
+    stage.innerHTML = '';
+  }
+  adsResetSheet(modal);
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.documentElement.classList.remove('ads-modal-open');
+  document.body.classList.remove('ads-modal-open');
+  _adsCurrentIndex = -1;
+  if (window.lenis) window.lenis.start();
+}
+
+function adsModalStep(dir) {
+  if (!_adsCards.length) return;
+  let i = _adsCurrentIndex + dir;
+  if (i < 0) i = _adsCards.length - 1;
+  if (i >= _adsCards.length) i = 0;
+  adsOpenModal(i, 'smooth');
+}
+
+function adsGridBatch() {
+  if (window.matchMedia('(max-width: 740px)').matches) return 8;
+  if (window.matchMedia('(max-width: 1280px)').matches) return 12;
+  return 15;
+}
+
+function adsRevealMore() {
+  const hidden = document.querySelectorAll('#adsgrid .adcard.is-hidden');
+  const batch = adsGridBatch();
+  for (let i = 0; i < batch && i < hidden.length; i++) hidden[i].classList.remove('is-hidden');
+  adsUpdateMoreVisibility();
+  if (typeof refreshScrollSystems === 'function') setTimeout(refreshScrollSystems, 150);
+}
+
+function adsUpdateMoreVisibility() {
+  const more = document.querySelector('.adsmore');
+  if (!more) return;
+  const remaining = document.querySelectorAll('#adsgrid .adcard.is-hidden').length;
+  more.classList.toggle('is-done', remaining === 0);
+}
+
+function adsDocClick(e) {
+  if (!e.target.closest('.cta')) adsCloseCta();
+}
+
+function adsDocKey(e) {
+  const modal = document.getElementById('adsmodal');
+  const modalOpen = modal && modal.classList.contains('open');
+  if (e.key === 'Escape') {
+    if (modalOpen) adsCloseModal();
+    else adsCloseCta();
+    return;
+  }
+  if (!modalOpen) return;
+  // Flèches / espace : navigation entre créas quand la modale est ouverte
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Spacebar') {
+    e.preventDefault();
+    adsModalStep(1);
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    adsModalStep(-1);
+  }
+}
+
+function initAds() {
+  const grid = document.getElementById('adsgrid');
+  if (!grid) return;
+
+  // Mobile : les ads "flottantes" du hero (les meilleures) rejoignent la tête
+  // de la grille au lieu d'être masquées → aucun contenu perdu. On retire les
+  // classes .adsfloat* : elles redeviennent de simples .adcard (rendu identique
+  // aux autres cards de la grille, sans conflit de positionnement/affichage).
+  if (window.matchMedia('(max-width: 740px)').matches) {
+    Array.from(document.querySelectorAll('#adshero .adsfloat')).reverse().forEach((f) => {
+      f.classList.remove('adsfloat', 'adsfloat--tl', 'adsfloat--tr', 'adsfloat--bl', 'adsfloat--br');
+      grid.insertBefore(f, grid.firstChild);
+    });
+  }
+
+  _adsCards = Array.from(document.querySelectorAll('.adcard'));
+
+  // Nombre de cards visibles initialement (desktop 5x3=15, tablette 3x4=12, mobile 2x4=8)
+  const initialVisible = adsGridBatch();
+  Array.from(grid.querySelectorAll('.adcard')).forEach((c, i) => {
+    c.classList.toggle('is-hidden', i >= initialVisible);
+  });
+
+  // Preview galerie : joue les vidéos visibles, pause hors écran (respecte
+  // prefers-reduced-motion → poster figé, pas d'autoplay).
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  _adsPreviewObserver = (!reduce && 'IntersectionObserver' in window)
+    ? new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        const v = en.target;
+        if (en.isIntersecting) { const p = v.play(); if (p && p.catch) p.catch(() => { }); }
+        else v.pause();
+      });
+    }, { rootMargin: '150px 0px' })
+    : null;
+
+  _adsCards.forEach((card, i) => {
+    card.addEventListener('click', () => adsOpenModal(i));
+    const move = (e) => adsSetCardLight(card, e);
+    card.addEventListener('mousemove', move);
+    _adsMoveHandlers.push({ el: card, fn: move });
+
+    // Preview animée : le <video.adcard-video> est déjà dans la card (HTML).
+    // On l'observe pour l'autoplay-quand-visible (au lieu d'un hover).
+    if (card.dataset.type === 'video') {
+      const vid = card.querySelector('.adcard-video');
+      if (vid && _adsPreviewObserver) _adsPreviewObserver.observe(vid);
+    }
+  });
+
+  const trigger = document.querySelector('.cta-trigger');
+  if (trigger) {
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const cta = trigger.closest('.cta');
+      const open = cta.classList.toggle('open');
+      trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  }
+
+  const more = document.querySelector('.adsmore');
+  if (more) {
+    more.addEventListener('click', adsRevealMore);
+    more.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); adsRevealMore(); }
+    });
+  }
+  adsUpdateMoreVisibility();
+
+  const modal = document.getElementById('adsmodal');
+  if (modal) {
+    modal.querySelector('.adsmodal-close').addEventListener('click', adsCloseModal);
+    modal.querySelector('.adsmodal-backdrop').addEventListener('click', adsCloseModal);
+    modal.querySelector('.adsmodal-prev').addEventListener('click', () => adsModalStep(-1));
+    modal.querySelector('.adsmodal-next').addEventListener('click', () => adsModalStep(1));
+
+    adsBuildThumbs();
+
+    // ----- Interactions mobile. Inertes en desktop (pas de touch). -----
+    const info = modal.querySelector('.adsmodal-info');
+    const details = modal.querySelector('.adsmodal-details');
+    const detailsInner = modal.querySelector('.adsmodal-details-inner');
+    const creative = modal.querySelector('.adsmodal-creative');
+    const thumbsWrap = modal.querySelector('.adsmodal-thumbs');
+
+    // Bottom-sheet : la hauteur des détails suit le doigt (--sheet 0→1),
+    // qui pilote aussi l'apparition ligne par ligne. Rubber-band à la limite
+    // haute + réglage lissé (easeOut) au relâcher.
+    if (info && details) {
+      const readSheet = () => parseFloat(info.style.getPropertyValue('--sheet')) || 0;
+      const contentH = () => (detailsInner && detailsInner.offsetHeight) || 1;
+      // --sheet pilote le masque de fondu ; la hauteur (px) pilote la taille
+      // (animée par transition CSS hors glissé → lissage + resize au switch).
+      // `rb` = dépassement du rebond, pour que les contrôles suivent le panneau
+      // même pendant le rubber-band (sinon ils décrocheraient aux limites).
+      const applySheet = (p, h, rb) => {
+        info.style.setProperty('--sheet', p);
+        const revele = p * (h || contentH());
+        details.style.height = revele + 'px';
+        adsSetCtrlShift(modal, revele + (rb || 0));
+      };
+
+      let dragging = false, moved = false, startY = 0, startSheet = 0, H = 1, curRb = 0;
+
+      const onStart = (e) => {
+        if (e.target.closest('.adsmodal-thumbs, .adsmodal-close, a, button')) return;
+        dragging = true; moved = false; curRb = 0;
+        startY = e.touches[0].clientY;
+        startSheet = readSheet();
+        H = contentH();
+        info.classList.add('is-dragging'); // suit le doigt : transitions coupées
+        modal.style.setProperty('--ads-ctrl-dur', '0s'); // idem pour les contrôles du player
+      };
+      const onMove = (e) => {
+        if (!dragging) return;
+        const dy = e.touches[0].clientY - startY;
+        if (!moved && Math.abs(dy) > 5) moved = true;
+        if (!moved) return;
+        e.preventDefault();
+        let raw = startSheet - dy / H;
+        curRb = 0;
+        // Rubber-band aux DEUX limites (rebond identique à l'ouverture ET à la
+        // fermeture) : dépassement borné à 28px, ressort au relâcher (transition).
+        if (raw > 1) { curRb = Math.min((raw - 1) * H * 0.2, 28); raw = 1; }
+        else if (raw < 0) { curRb = Math.max(raw * H * 0.2, -28); raw = 0; }
+        applySheet(raw, H, curRb);
+        info.style.transform = curRb ? `translateY(${-curRb}px)` : '';
+      };
+      const onEnd = (e) => {
+        if (!dragging) return;
+        dragging = false;
+        info.classList.remove('is-dragging'); // réactive les transitions (lissage)
+        modal.style.removeProperty('--ads-ctrl-dur'); // idem : les contrôles relissent
+        info.style.transform = '';             // rubber-band : retour lissé (transition)
+        if (!moved) {
+          // Tap simple : ouvre/ferme (sauf tap dans le contenu détaillé)
+          if (e.target.closest('.adsmodal-details-inner')) return;
+          applySheet(startSheet > 0.5 ? 0 : 1, H);
+          return;
+        }
+        const dy = e.changedTouches[0].clientY - startY;
+        let to;
+        if (Math.abs(dy) > 40) to = dy < 0 ? 1 : 0;
+        else to = readSheet() > 0.5 ? 1 : 0;
+        applySheet(to, H);
+      };
+
+      info.addEventListener('touchstart', onStart, { passive: true });
+      info.addEventListener('touchmove', onMove, { passive: false });
+      info.addEventListener('touchend', onEnd);
+      _adsModalHandlers.push({ el: info, type: 'touchstart', fn: onStart });
+      _adsModalHandlers.push({ el: info, type: 'touchmove', fn: onMove });
+      _adsModalHandlers.push({ el: info, type: 'touchend', fn: onEnd });
+    }
+
+    // Carrousel : au relâcher du drag, la course se prolonge selon l'inertie du
+    // geste puis se COLLE (snap) pile au centre sur la vignette la plus proche,
+    // qui devient la créa active.
+    if (thumbsWrap) {
+      const nT = _adsCards.length;
+      let scrollTimer = null;
+      let thumbDragging = false;
+
+      // Colle sur la vignette la plus proche de `projScroll` (position projetée
+      // par l'inertie, pas la position au relâcher) et l'amène EXACTEMENT au
+      // centre. Recentre d'abord la boucle : on reste dans la copie du milieu, le
+      // saut est invisible (les 3 copies sont identiques) ; la projection est
+      // décalée du même montant pour rester cohérente.
+      const snapTo = (projScroll) => {
+        const items = thumbsWrap.querySelectorAll('.adsthumb');
+        if (!items.length) return;
+        if (nT > 0 && items.length >= 3 * nT) {
+          const setW = items[nT].offsetLeft - items[0].offsetLeft;
+          if (setW > 0) {
+            while (projScroll < setW * 0.5) { projScroll += setW; thumbsWrap.scrollLeft += setW; }
+            while (projScroll > setW * 2.5) { projScroll -= setW; thumbsWrap.scrollLeft -= setW; }
+          }
+        }
+        const mid = projScroll + thumbsWrap.clientWidth / 2;
+        let best = null, bd = Infinity;
+        items.forEach((t) => {
+          const d = Math.abs(t.offsetLeft + t.offsetWidth / 2 - mid);
+          if (d < bd) { bd = d; best = t; }
+        });
+        if (!best) return;
+        const idx = parseInt(best.dataset.idx, 10);
+        // La vignette grandit dès le départ du mouvement (retour immédiat, et le
+        // scale ne déplace aucune position), mais la créa n'est construite qu'à
+        // l'arrivée : monter un player HLS en pleine animation la faisait saccader.
+        items.forEach((t) => t.classList.toggle('active', parseInt(t.dataset.idx, 10) === idx));
+        if (scrollTimer) { clearTimeout(scrollTimer); scrollTimer = null; }
+        adsAnimateThumbs(thumbsWrap, adsThumbScrollTarget(thumbsWrap, best), () => {
+          if (scrollTimer) { clearTimeout(scrollTimer); scrollTimer = null; }
+          if (idx !== _adsCurrentIndex) adsOpenModal(idx, 'skip');
+        });
+      };
+
+      const onScroll = () => {
+        // Pendant le drag ou l'animation de snap : aucun effet (ni recentrage ni
+        // reconstruction de créa) → mouvement fluide. Ne sert donc que de filet
+        // pour un scroll non piloté par le drag (molette en desktop).
+        if (thumbDragging || _adsThumbAnim) return;
+        if (scrollTimer) clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => snapTo(thumbsWrap.scrollLeft), 120);
+      };
+      thumbsWrap.addEventListener('scroll', onScroll, { passive: true });
+      _adsModalHandlers.push({ el: thumbsWrap, type: 'scroll', fn: onScroll });
+
+      // Drag du carrousel en Pointer Events + setPointerCapture : capture le geste
+      // quels que soient les ancêtres (contourne le quirk iOS où le listener
+      // touchmove non-passif du bottom-sheet empêche le scroll tactile natif). On
+      // pilote scrollLeft (touch-action:none), delta incrémental → suivi fluide du doigt.
+      let pDown = false, pDrag = false, pId = null, pStartX = 0, pLastX = 0;
+      let pVel = 0, pLastT = 0;              // vélocité lissée (px/ms) pour l'inertie
+      const pdown = (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        // Reprendre la main en plein glissement : on coupe le snap en cours.
+        if (_adsThumbRaf) { cancelAnimationFrame(_adsThumbRaf); _adsThumbRaf = null; _adsThumbAnim = false; }
+        pDown = true; pDrag = false; pId = e.pointerId; pStartX = pLastX = e.clientX;
+        pVel = 0; pLastT = performance.now();
+      };
+      const pmove = (e) => {
+        if (!pDown || e.pointerId !== pId) return;
+        if (!pDrag) {
+          if (Math.abs(e.clientX - pStartX) < 6) return; // seuil : tap vs drag (préserve le clic de sélection)
+          pDrag = true; thumbDragging = true;
+          if (scrollTimer) { clearTimeout(scrollTimer); scrollTimer = null; } // annule un snap en attente
+          try { thumbsWrap.setPointerCapture(pId); } catch (_) { }
+        }
+        const now = performance.now();
+        const dx = e.clientX - pLastX;
+        const dt = now - pLastT;
+        // Moyenne mobile : assez lissée pour ignorer le bruit d'une frame, assez
+        // réactive pour capter le coup de pouce final du doigt.
+        if (dt > 0) { pVel = pVel * 0.7 + (dx / dt) * 0.3; pLastT = now; }
+        thumbsWrap.scrollLeft -= dx;
+        pLastX = e.clientX;
+      };
+      const pup = (e) => {
+        if (e.pointerId !== pId) return;
+        const wasDrag = pDrag;
+        if (pDrag) { try { thumbsWrap.releasePointerCapture(pId); } catch (_) { } }
+        pDown = false; pDrag = false; pId = null;
+        if (!wasDrag) return;
+        thumbDragging = false;
+        // Doigt immobilisé avant le relâcher → pas d'inertie : l'utilisateur a
+        // choisi de s'arrêter là, on colle simplement sur la plus proche.
+        if (performance.now() - pLastT > 80) pVel = 0;
+        // ADS_THUMB_FLICK (90 ms) = fenêtre de projection de l'inertie.
+        // Plus haut = un flick emmène plus loin.
+        snapTo(thumbsWrap.scrollLeft - pVel * 90);
+      };
+      thumbsWrap.addEventListener('pointerdown', pdown);
+      thumbsWrap.addEventListener('pointermove', pmove);
+      thumbsWrap.addEventListener('pointerup', pup);
+      thumbsWrap.addEventListener('pointercancel', pup);
+      _adsModalHandlers.push({ el: thumbsWrap, type: 'pointerdown', fn: pdown });
+      _adsModalHandlers.push({ el: thumbsWrap, type: 'pointermove', fn: pmove });
+      _adsModalHandlers.push({ el: thumbsWrap, type: 'pointerup', fn: pup });
+      _adsModalHandlers.push({ el: thumbsWrap, type: 'pointercancel', fn: pup });
+    }
+
+    // Swipe horizontal sur la créa : change de créa (recentre le carrousel)
+    if (creative) {
+      let cx = 0, cy = 0;
+      const cts = (e) => { cx = e.touches[0].clientX; cy = e.touches[0].clientY; };
+      const cte = (e) => {
+        const dx = e.changedTouches[0].clientX - cx;
+        const dy = e.changedTouches[0].clientY - cy;
+        if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
+        adsModalStep(dx < 0 ? 1 : -1);
+      };
+      creative.addEventListener('touchstart', cts, { passive: true });
+      creative.addEventListener('touchend', cte);
+      _adsModalHandlers.push({ el: creative, type: 'touchstart', fn: cts });
+      _adsModalHandlers.push({ el: creative, type: 'touchend', fn: cte });
+    }
+  }
+
+  if (!_adsDocBound) {
+    document.addEventListener('click', adsDocClick);
+    document.addEventListener('keydown', adsDocKey);
+    _adsDocBound = true;
+  }
+
+  // viewport-fit=cover est posé en dur dans ads.html. Position du ✕ (--ads-close-top)
+  // et hauteur du panneau replié (--ads-sheet-h) recalculées au resize/rotation.
+  adsSetSafeMin();
+  _adsResizeHandler = () => { adsSetSafeMin(); adsSyncSheetHeight(); };
+  window.addEventListener('resize', _adsResizeHandler);
+  window.addEventListener('orientationchange', _adsResizeHandler);
+
+  // Optimisations de rendu du panneau bas mobile, portées par une seule classe →
+  // ADS_PANEL_PERF = false suffit à toutes les désactiver (voir le CSS .ads-perf).
+  const modalEl = document.getElementById('adsmodal');
+  if (modalEl) modalEl.classList.toggle('ads-perf', ADS_PANEL_PERF);
+}
+
+function cleanupAds() {
+  if (_adsPreviewObserver) { _adsPreviewObserver.disconnect(); _adsPreviewObserver = null; }
+  // On quitte la page ads (Barba ne recharge pas le <head>) : on retire
+  // viewport-fit=cover pour ne pas l'imposer aux autres pages.
+  const vp = document.querySelector('meta[name="viewport"]');
+  if (vp) vp.setAttribute('content', (vp.getAttribute('content') || '').replace(/,?\s*viewport-fit\s*=\s*cover/i, ''));
+  if (_adsResizeHandler) {
+    window.removeEventListener('resize', _adsResizeHandler);
+    window.removeEventListener('orientationchange', _adsResizeHandler);
+    _adsResizeHandler = null;
+  }
+  document.documentElement.style.removeProperty('--ads-close-top');
+  _adsMoveHandlers.forEach(({ el, fn }) => el.removeEventListener('mousemove', fn));
+  _adsVideoHandlers.forEach(({ el, enter, leave }) => {
+    el.removeEventListener('mouseenter', enter);
+    el.removeEventListener('mouseleave', leave);
+  });
+  _adsModalHandlers.forEach(({ el, type, fn }) => el.removeEventListener(type, fn));
+  _adsMoveHandlers = [];
+  _adsVideoHandlers = [];
+  _adsModalHandlers = [];
+  if (_adsDocBound) {
+    document.removeEventListener('click', adsDocClick);
+    document.removeEventListener('keydown', adsDocKey);
+    _adsDocBound = false;
+  }
+  adsCloseModal();
+  _adsCards = [];
+}
+
 
 const lerp = (f0, f1, t) => (1 - t) * f0 + t * f1;
 const clamp = (val, min, max) => Math.max(min, Math.min(val, max));
@@ -1254,92 +1998,9 @@ const osInstance = OverlayScrollbars(document.querySelector('body'), {
 
 
 
-function reloadVidstackResources() {
-  const themeLink = document.querySelector('link[href="https://cdn.vidstack.io/player/theme.css"]');
-  const videoLink = document.querySelector('link[href="https://cdn.vidstack.io/player/video.css"]');
-  const playerScript = document.querySelector('script[src="https://cdn.vidstack.io/player@1.15.5"]');
-
-  if (themeLink) themeLink.remove();
-  if (videoLink) videoLink.remove();
-  if (playerScript) playerScript.remove();
-
-  loadPlayerScripts();
-}
-
-
-function loadPlayerScripts() {
-  return new Promise((resolve, reject) => {
-    // Check if the player script is already loaded
-    const existingScript = document.querySelector('script[src="https://cdn.vidstack.io/player@1.15.5"]');
-    const existingThemeCSS = document.querySelector('link[href="https://cdn.vidstack.io/player/theme.css"]');
-    const existingVideoCSS = document.querySelector('link[href="https://cdn.vidstack.io/player/video.css"]');
-
-    if (existingScript && existingThemeCSS && existingVideoCSS) {
-      console.log('Player.js and CSS are already loaded.');
-      resolve();
-    } else {
-      // Create an array to hold promises for loading scripts and styles
-      const loadPromises = [];
-
-      // Load player.js script if not already loaded
-      if (!existingScript) {
-        console.log('Loading Player.js script...');
-        const script = document.createElement('script');
-        script.src = 'https://cdn.vidstack.io/player@1.15.5';
-        script.type = 'module';
-        script.onload = () => {
-          console.log('Player.js script loaded successfully.');
-        };
-        script.onerror = () => {
-          console.error('Failed to load Player.js script.');
-          reject();
-        };
-        document.head.appendChild(script);
-        loadPromises.push(new Promise((res, rej) => {
-          script.onload = res;
-          script.onerror = rej;
-        }));
-      }
-
-      // Load player theme CSS if not already loaded
-      if (!existingThemeCSS) {
-        console.log('Loading Player.js theme CSS...');
-        const themeLink = document.createElement('link');
-        themeLink.rel = 'stylesheet';
-        themeLink.href = 'https://cdn.vidstack.io/player/theme.css';
-        document.head.appendChild(themeLink);
-        loadPromises.push(new Promise((res, rej) => {
-          themeLink.onload = res;
-          themeLink.onerror = rej;
-        }));
-      }
-
-      // Load player video CSS if not already loaded
-      if (!existingVideoCSS) {
-        console.log('Loading Player.js video CSS...');
-        const videoLink = document.createElement('link');
-        videoLink.rel = 'stylesheet';
-        videoLink.href = 'https://cdn.vidstack.io/player/video.css';
-        document.head.appendChild(videoLink);
-        loadPromises.push(new Promise((res, rej) => {
-          videoLink.onload = res;
-          videoLink.onerror = rej;
-        }));
-      }
-
-      // Resolve the main promise when all scripts and styles are loaded
-      Promise.all(loadPromises)
-        .then(() => {
-          console.log('All Player.js resources loaded successfully.');
-          resolve();
-        })
-        .catch((err) => {
-          console.error('Failed to load Player.js resources:', err);
-          reject(err);
-        });
-    }
-  });
-}
+// [Migration Vidstack → Video.js v10] Les loaders Vidstack (reloadVidstackResources / loadPlayerScripts)
+// ont été retirés : le player v10 est auto-hébergé et chargé une fois via <script type="module"> dans le <head>.
+// Le comportement du player v10 est géré par le module window.V10 (init/cleanup par namespace Barba, plus bas).
 
 
 
@@ -1651,3 +2312,174 @@ function setupAllPlayersLoading(root) {
 }
 
 document.addEventListener('DOMContentLoaded', () => setupAllPlayersLoading());
+
+
+/* ----------------------------------------------------------------------------
+   Player Video.js v10 : module window.V10 (montage/démontage par namespace Barba).
+   V10.init(root) : monte les .v10-player de `root` + comportements custom
+                    (miniature animée, volume 50%, loop, PiP/AirPlay off, hitbox 44px,
+                     bouton play central tactile, maintien menu ~4s).
+   V10.cleanup()  : démonte tout (listeners/timers/intervals tracés) sans fuite.
+   Curseur : ADDITIF au système du site (growOnHover gère position + grossissement hors player).
+             Ici on ne touche au dot QUE sur un .v10-player : label Play/Pause sur la zone vidéo,
+             et masquage (scale 0) sur les contrôles (shadow-DOM). Hors player -> on ne fait rien.
+---------------------------------------------------------------------------- */
+(function () {
+  var TOUCH = window.matchMedia('(hover: none)').matches;
+  // "contrôles" = boutons/sliders/conteneurs de barre|menu (PAS media-container/gesture/poster qui couvrent la vidéo)
+  var CTRL = /(-button|slider|^media-(controls|control-bar|menu|tooltip|popover|time|volume|seek-indicator|status-indicator|playback-rate|quality|audio-track))/i;
+  // :not(#zz) booste la spécificité pour battre le outline:focus-visible de v10
+  var SHADOW_CSS = 'media-pip-button,media-airplay-button{display:none!important}' +
+    '*{-webkit-tap-highlight-color:transparent!important}' +
+    ':focus:not(#zz),:focus-visible:not(#zz){outline:0!important;outline-color:transparent!important}' +
+    'media-container{cursor:pointer!important}' +  // garde le curseur natif macOS visible (v10 met cursor:none en lecture)
+    // fond de la barre boutons/menus = pastille sombre (icônes blanches lisibles sur fond clair ET sombre). L'arrondi du player est géré en light-DOM via --media-border-radius.
+    '.media-default-skin--video{--media-surface-background-color:oklch(0% 0 0 / .25)!important}' +
+    // Le <video> DANS le shadow de hlsjs-video est décalé vers le bas sur Safari (résolution height:100% vs aspect-ratio).
+    // On le cale en absolu (inset:0) pour qu'il remplisse son conteneur quelle que soit la taille, comme le media-poster (qui marche sur Safari).
+    'video{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important}' +
+    // (PAS de transform sur la vidéo : un translateZ décale la <video> vers le bas sur Safari. Le noir Safari est réglé
+    //  en amont par le clearProps du transform d'intro sur #video ; cf. introanimation()/pageentrance() dans script.js.)
+    // ±10s masqués (ta demande). AUCUN hack flex/nowrap/container-query : layout responsive NATIF de v10 (2 rangées
+    // timeline + boutons, comme la page de test) -> ne saute pas au resize, se réagence proprement.
+    'media-seek-button{display:none!important}' +
+    // Preview storyboard : elle déborde en haut du player sur petit player. On la réduit VISUELLEMENT via la propriété
+    // `scale` (n'change PAS la taille de layout -> v10 ne recalcule pas le sprite <img>, qui deviendrait noir sur Safari).
+    // v10 centre via `translate:-50%` (propriété distincte) -> le centrage horizontal est préservé. Origine en bas =
+    // reste ancrée au-dessus de la progression. Paliers progressifs (mobile/tablette réels ~22-26rem) ; desktop = naturel.
+    '@container media-root (width < 26rem){.media-thumbnail{transform-origin:center bottom!important;scale:.85!important}}' +
+    '@container media-root (width < 22rem){.media-thumbnail{scale:.7!important}}' +
+    '@container media-root (width < 19rem){.media-thumbnail{scale:.56!important}}' +
+    '@media (hover:none){media-play-button,media-mute-button,media-fullscreen-button,media-playback-rate-button,media-captions-button,media-cast-button{min-width:44px;min-height:44px}}';
+  // rule pour masquer le contrôle du son sur les players sans audio (classe .v10-no-audio)
+  var NO_AUDIO_CSS = 'media-mute-button,media-volume-slider{display:none!important}';
+  // dans la modale ads (mobile) : la créa 9:16 doit REMPLIR la zone visible (rognée
+  // haut+bas), pas être letterboxée → cover au lieu du contain global du shadow.
+  var ADS_COVER_CSS = 'video{object-fit:cover!important;object-position:center!important}';
+  // Modale ads en MOBILE uniquement : les contrôles se posent 10px au-dessus du
+  // panneau de détails et le suivent quand il s'ouvre/se ferme.
+  //   media-controls est en position:absolute;bottom:8px dans le shadow de v10.
+  //   Le bas de la boîte du player est à --ads-sheet-h/2 SOUS le haut du panneau
+  //   replié (cf. le centrage de .adsmodal-creative), d'où le `bottom` de base.
+  //   La part variable passe par un translateY : propriété compositée, donc pas de
+  //   relayout par frame, contrairement à une animation de `bottom`.
+  //   --ads-ctrl-shift (px révélés du panneau + rebond) et --ads-ctrl-dur (0s
+  //   pendant le glissé pour coller au doigt) sont posés sur #adsmodal par le
+  //   bloc ADS : les propriétés personnalisées franchissent le shadow DOM.
+  // Menus ouvrants (réglages/qualité, popover du volume) : v10 les positionne en
+  // CSS anchor positioning (`bottom: calc(anchor(top))`, ancré au bouton). Deux
+  // raisons pour ne pas s'y fier ici : ce sont des `popover` → au top layer, donc
+  // INSENSIBLES au transform de media-controls ; et anchor() n'est pas fiable sur
+  // Safari, où la déclaration est alors ignorée et le menu retombe sur le bas du
+  // viewport. On repose donc leur `bottom` sur le viewport (ils sont en
+  // position:fixed), sans anchor() : `!important` en feuille de style bat le style
+  // inline sans !important que pose v10.
+  //   Repère : bas de la boîte du player = 100dvh - --ads-sheet-h/2, contrôles à
+  //   --ads-sheet-h/2 + 10px au-dessus, et le bouton Réglages culmine 46px au-dessus
+  //   du bas des contrôles (36px de bouton + 10px de padding interne v10) ; +8px =
+  //   l'écart que v10 met lui-même entre le bouton et son menu. D'où 10 + 54.
+  var ADS_MENU_BOTTOM = 'calc(var(--ads-sheet-h, 115px) + 10px + 54px + var(--ads-ctrl-shift, 0px))';
+  var ADS_CTRL_CSS = '@media (max-width:740px){media-controls{' +
+    'bottom:calc(var(--ads-sheet-h, 115px) / 2 + 10px)!important;' +
+    'transform:translateY(calc(-1 * var(--ads-ctrl-shift, 0px)))!important;' +
+    'transition:transform var(--ads-ctrl-dur, .38s) cubic-bezier(.67,.01,.27,1)!important}' +
+    'media-menu[popover],media-popover[popover]{' +
+    'top:auto!important;bottom:' + ADS_MENU_BOTTOM + '!important;' +
+    'transition:bottom var(--ads-ctrl-dur, .38s) cubic-bezier(.67,.01,.27,1)!important}}';
+  function playerExtraCSS(o) {
+    var ex = o.noAudio ? NO_AUDIO_CSS : '';
+    if (o.p && o.p.closest && o.p.closest('#adsmodal')) ex += ADS_COVER_CSS + ADS_CTRL_CSS;
+    return ex;
+  }
+  function inject(root, extra) { if (!root || root.__p) return; try { var s = document.createElement('style'); s.textContent = SHADOW_CSS + (extra || ''); root.appendChild(s); root.__p = 1; } catch (e) { } }
+  function walkShadows(node, extra) { if (!node || !node.querySelectorAll) return; node.querySelectorAll('*').forEach(function (el) { if (el.shadowRoot) { inject(el.shadowRoot, extra); walkShadows(el.shadowRoot, extra); } }); }
+  function findInShadows(root, sel) { if (!root) return null; var f = root.querySelector(sel); if (f) return f; var els = root.querySelectorAll('*'); for (var i = 0; i < els.length; i++) { if (els[i].shadowRoot) { var r = findInShadows(els[i].shadowRoot, sel); if (r) return r; } } return null; }
+  function GS() { return window.gsap || window.TweenMax; }  // le site expose gsap (et TweenMax en compat)
+
+  var S = null;  // état monté (null = démonté)
+
+  function init(root) {
+    root = root || document;
+    if (S) cleanup();  // idempotent : jamais deux montages superposés
+    var found = root.querySelectorAll ? root.querySelectorAll('.v10-player') : [];
+    if (!found.length) return;  // page sans player v10 -> aucun listener global posé
+    var mouse = document.getElementById('mouse');
+    var label = document.getElementById('hoverinteraction');
+    S = { players: [], hovered: null, listeners: [], timeouts: [], intervals: [], cursorState: '', mouse: mouse, label: label };
+    function addL(t, ev, fn, opts) { t.addEventListener(ev, fn, opts); S.listeners.push([t, ev, fn, opts]); }
+    function addT(fn, ms) { var id = setTimeout(fn, ms); S.timeouts.push(id); return id; }
+    function addI(fn, ms) { var id = setInterval(fn, ms); S.intervals.push(id); return id; }
+    // Un seul player à la fois : au démarrage d'une vidéo, met en pause TOUTES les autres (jamais d'audios/vidéos superposés sur les pages multi-players).
+    function pauseOthers(except) { if (!S) return; S.players.forEach(function (o) { if (o === except) return; try { var v = o.video && o.video(); if (v && !v.paused) v.pause(); } catch (e) { } }); }
+
+    found.forEach(function (p) {
+      var media = p.querySelector('hlsjs-video, vimeo-video');
+      var plain = media ? null : p.querySelector('video-skin > video, video-player > video');  // provider <video> natif (sound-design), PAS le poster (media-poster > video)
+      var o = { p: p, media: media, playing: false, controls: null, controlsHidden: false, lastActivity: 0, noAudio: p.classList.contains('v10-no-audio') };
+      S.players.push(o);
+      function video() { return plain || (media && media.shadowRoot && media.shadowRoot.querySelector('video')); }
+      o.video = video;
+      function play() { try { var v = video(); v && v.play(); } catch (e) { } }
+      o.play = play;
+      // bouton play central (affiché en tactile avant la 1re lecture)
+      var badge = document.createElement('button');
+      badge.className = 'play-badge'; badge.setAttribute('aria-label', 'Lire');
+      badge.innerHTML = '<svg viewBox="0 0 18 18" width="26" height="26" fill="currentColor" aria-hidden="true"><path d="m14.051 10.723-7.985 4.964a1.98 1.98 0 0 1-2.758-.638A2.06 2.06 0 0 1 3 13.964V4.036C3 2.91 3.895 2 5 2c.377 0 .747.109 1.066.313l7.985 4.964a2.057 2.057 0 0 1 .627 2.808c-.16.257-.373.475-.627.637"/></svg>';
+      addL(badge, 'click', function (e) { e.stopPropagation(); play(); });
+      p.appendChild(badge);
+      o.setPlaying = function (v) { o.playing = v; p.classList.toggle('is-playing', v); if (v) { p.classList.add('started'); if (o.controls && o.controlsHidden) { o.controls.style.display = ''; o.controlsHidden = false; } } if (S && S.hovered === o && label) label.textContent = v ? 'Pause' : 'Play'; };
+      function bindState() {
+        var v = video(); if (!v) return false;
+        try { v.loop = true; } catch (e) { }
+        try { v.volume = 0.5; } catch (e) { }
+        addL(v, 'loadedmetadata', function () { try { v.volume = 0.5; } catch (e) { } });
+        addL(v, 'playing', function () { o.setPlaying(true); pauseOthers(o); });
+        addL(v, 'play', function () { o.setPlaying(true); pauseOthers(o); });
+        addL(v, 'pause', function () { o.setPlaying(false); });
+        return true;
+      }
+      if (!bindState()) { var iv = addI(function () { if (bindState()) clearInterval(iv); }, 300); addT(function () { clearInterval(iv); }, 8000); }
+    });
+
+    function injectPlayers() { S.players.forEach(function (o) { walkShadows(o.p, playerExtraCSS(o)); }); }
+    function hideBeforeFirstPlay() { S.players.forEach(function (o) { if (!o.controls) { var skin = o.p.querySelector('video-skin'); o.controls = findInShadows(skin && skin.shadowRoot, 'media-controls'); } if (TOUCH && o.controls && !o.p.classList.contains('started') && !o.controlsHidden) { o.controls.style.display = 'none'; o.controlsHidden = true; } }); }
+    [0, 300, 800, 1500, 3000].forEach(function (d) { addT(function () { if (!S) return; injectPlayers(); hideBeforeFirstPlay(); }, d); });
+    addL(document, 'pointerdown', function (e) { if (!S) return; for (var i = 0; i < S.players.length; i++) { if (S.players[i].p.contains(e.target)) { var pl = S.players[i].p, ex = playerExtraCSS(S.players[i]); walkShadows(pl, ex); addT(function () { walkShadows(pl, ex); }, 60); break; } } }, true);
+
+    // maintien menu : garde les contrôles ouverts ~4s après la dernière activité tant qu'un menu est ouvert
+    function menuOpen(o) { var skin = o.p.querySelector('video-skin'); if (!skin || !skin.shadowRoot) return false; var found = false; (function scan(rt) { if (!rt || found) return; (rt.querySelectorAll('media-popover, media-menu-view, [role="menu"]') || []).forEach(function (e) { if (e.offsetHeight > 0 || e.offsetWidth > 0) found = true; }); rt.querySelectorAll('*').forEach(function (e) { if (e.shadowRoot) scan(e.shadowRoot); }); })(skin.shadowRoot); return found; }
+    ['pointerdown', 'pointermove', 'keydown', 'touchstart'].forEach(function (ev) {
+      addL(document, ev, function (e) { if (!e.isTrusted || !S) return; for (var i = 0; i < S.players.length; i++) { if (S.players[i].p.contains(e.target)) { S.players[i].lastActivity = Date.now(); break; } } }, true);
+    });
+    addI(function () { if (!S) return; S.players.forEach(function (o) { if (!o.playing || !menuOpen(o)) return; if (Date.now() - o.lastActivity >= 4000) return; var skin = o.p.querySelector('video-skin'); var mc = findInShadows(skin && skin.shadowRoot, 'media-container'); if (mc) { try { mc.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, clientX: 1, clientY: 1 })); } catch (e) { } } }); }, 500);
+
+    // Curseur additif : ne touche au dot que sur un .v10-player
+    var g = GS();
+    if (g && mouse && label) {
+      addL(document.body, 'mousemove', function (e) {
+        if (!S) return;
+        var path = e.composedPath ? e.composedPath() : [], player = null, onCtrl = false;
+        for (var i = 0; i < path.length; i++) { var el = path[i]; if (!el || !el.tagName) continue; if (CTRL.test(el.tagName)) onCtrl = true; if (el.classList && el.classList.contains('v10-player')) { player = el; break; } }
+        var ns = !player ? 'out' : (onCtrl ? 'ctrl' : 'video');
+        if (ns === S.cursorState) return; S.cursorState = ns;
+        if (ns === 'video') { S.hovered = S.players.filter(function (x) { return x.p === player; })[0] || null; label.textContent = (S.hovered && S.hovered.playing) ? 'Pause' : 'Play'; g.to(mouse, { duration: 0.3, scale: 1 }); g.to(label, { duration: 0.3, scale: 1 }); }
+        else if (ns === 'ctrl') { S.hovered = null; g.to(mouse, { duration: 0.3, scale: 0 }); g.to(label, { duration: 0.15, scale: 0 }); }
+        else { S.hovered = null; g.to(mouse, { duration: 0.3, scale: 0.5 }); g.to(label, { duration: 0.2, scale: 0 }); }  // hors player : réinitialise le dot (les containers case study ne sont pas des #link -> growOnHover ne le réinitialise pas)
+      });
+    }
+  }
+
+  function cleanup() {
+    if (!S) return;
+    S.listeners.forEach(function (l) { try { l[0].removeEventListener(l[1], l[2], l[3]); } catch (e) { } });
+    S.timeouts.forEach(function (id) { clearTimeout(id); });
+    S.intervals.forEach(function (id) { clearInterval(id); });
+    S.players.forEach(function (o) { try { var v = o.video && o.video(); if (v) { v.pause(); v.removeAttribute('src'); } } catch (e) { } });  // stoppe le flux ; v10 finit au disconnect (Barba retire le container)
+    var g = GS();
+    if (g && S.mouse) { try { g.to(S.mouse, { duration: 0.2, scale: 0.5 }); } catch (e) { } }
+    if (g && S.label) { try { g.to(S.label, { duration: 0.2, scale: 0 }); } catch (e) { } }
+    S = null;
+  }
+
+  window.V10 = { init: init, cleanup: cleanup };
+})();

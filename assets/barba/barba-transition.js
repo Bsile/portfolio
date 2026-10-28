@@ -25,6 +25,7 @@ barba.init({
 
 barba.hooks.once((data) => {
   initializeLenis(); // Initialiser Lenis lors du chargement initial
+  if (window.V10) V10.init(document); // monte le player v10 au chargement initial (no-op si aucun .v10-player sur la page)
 });
 
 barba.hooks.beforeEnter((data) => {
@@ -43,34 +44,33 @@ barba.hooks.beforeEnter((data) => {
     });
   }
   if (data.next.namespace === 'home') {
-    reloadVidstackResources().then(() => {
-      popupvimeo();
-      initializeLenis();
-    });
+    if (window.V10) V10.init(data.next.container); // player v10 du showreel
+    popupvimeo();
+    initializeLenis();
   }
   if (data.next.namespace === 'extrapixels') {
     initScroll();
   }
   if (data.next.namespace === 'makebetter') {
-    reloadVidstackResources().then(() => {
-      initParallax();
-      initializeLenis();
-      observeSections();
-    });
+    if (window.V10) V10.init(data.next.container); // player v10 (hero)
+    initParallax();
+    initializeLenis();
+    observeSections();
   }
   if (data.next.namespace === 'drime') {
-    reloadVidstackResources().then(() => {
-      initParallax();
-      initializeLenis();
-      observeSections();
-    });
+    if (window.V10) V10.init(data.next.container); // players v10 (2 heros HLS + 2 sound-design)
+    initParallax();
+    initializeLenis();
+    observeSections();
   }
   if (data.next.namespace === 'upreview') {
-    reloadVidstackResources().then(() => {
-      initParallax();
-      initializeLenis();
-      observeSections();
-    });
+    if (window.V10) V10.init(data.next.container); // players v10 (main + teaser + 2 sound-design)
+    initParallax();
+    initializeLenis();
+    observeSections();
+  }
+  if (data.next.namespace === 'ads') {
+    initAds();
   }
 });
 
@@ -115,19 +115,8 @@ barba.hooks.afterEnter((data) => {
 
 
 
-barba.hooks.afterEnter((data) => {
-  const posters = document.querySelectorAll('media-poster');
-  posters.forEach(poster => {
-    const src = poster.getAttribute('src');
-    poster.setAttribute('src', ''); // Supprime temporairement l'image
-    poster.setAttribute('src', src); // Recharge l'image
-  });
-});
-
-
-
-
 barba.hooks.afterLeave((data) => {
+  if (window.V10) V10.cleanup(); // démonte le player v10 de la page quittée (home/makebetter/drime/upreview) : idempotent, stoppe le flux HLS + retire les listeners
   data.current.container.remove();
   if (data.current.namespace === 'about') {
     cleanupWebGL();
@@ -146,6 +135,9 @@ barba.hooks.afterLeave((data) => {
   if (data.current.namespace === 'extrapixels') {
     cleanupScroll();
     destroySwiper();
+  }
+  if (data.current.namespace === 'ads') {
+    cleanupAds();
   }
 });
 

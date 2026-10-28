@@ -2,7 +2,7 @@
   "name": "portfolio",
   "version": "1.0.0",
   "private": true,
-  "description": "Portfolio statique de Basile R. — build de minification des assets.",
+  "description": "Portfolio statique de Basile R., avec build de minification des assets.",
   "scripts": {
     "build:css": "esbuild assets/css/style.css --minify --outfile=assets/css/style.min.css",
     "build:js": "esbuild assets/script/script.js --minify-whitespace --minify-syntax --drop:console --outfile=assets/script/script.min.js",

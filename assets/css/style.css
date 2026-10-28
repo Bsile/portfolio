@@ -1,6 +1,6 @@
 /* Styles par défaut */
 
-/* Police Inter servie en local (variable 100–900) — plus de dépendance à Google Fonts */
+/* Police Inter servie en local (variable 100–900), donc plus de dépendance à Google Fonts */
 @font-face {
     font-family: 'Inter';
     src: url('../fonts/Inter-Variable.woff2') format('woff2');
@@ -510,7 +510,9 @@ nav h3 {
 #floatnav {
     position: fixed;
     width: 100vw;
-    height: 75px;
+    height: calc(75px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
     display: none;
     justify-content: center;
     align-items: center;
@@ -1330,9 +1332,7 @@ media-player {
    dans tous les cas (wrapper + spinner), en forçant pour battre les styles Vidstack. */
 .vds-buffering-indicator,
 .vds-buffering-spinner,
-media-spinner {
-    display: none !important;
-}
+/* (retiré : la règle vidstack `media-spinner{display:none}` masquait le spinner de chargement de v10, car media-spinner est aussi utilisé par v10) */
 
 .vds-airplay-button {
     display: none;
@@ -1626,11 +1626,140 @@ media-tooltip-content {
     outline-width: 1px;
     transition: outline-color ease 0.4s;
     outline-color: var(--border);
+    /* conteneur du player v10 : garde son arrondi 12px + contour (outline). overflow:hidden clippe le player
+       à ce rayon (comme la page de test validée). Le compositing vidéo sur Safari (ancêtres transformés :
+       intro GSAP + hover) est géré par translateZ sur la vidéo dans le SHADOW_CSS du module V10. */
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    --media-border-radius: 12px;
+    /* showreel arrondi 12px (le container v10 hérite de cette var, sinon 2rem par défaut) */
 }
 
 #video:hover {
     transition: all ease 0.4s;
     outline-color: var(--borderhover);
+}
+
+/* --- Player Video.js v10 : remplit son container (#video showreel, #xxxheader case studies) --- */
+/* défaut : arrondi 0 (case studies héros full-bleed) ; le container clippe via son propre overflow:hidden.
+   #video (showreel) surcharge à 12px ci-dessus. v10 lit --media-border-radius (fallback 2rem sinon). */
+.v10-player {
+    --media-border-radius: 0;
+    position: relative;
+    overflow: hidden;
+    display: block;
+    border-radius: 12px;
+    /* bords arrondis 12px (comme le showreel) ; overflow:hidden clippe la vidéo (carrée, --media-border-radius:0) à ce rayon.
+       position/overflow pour les containers-wrappers (animation, sound-design) ; l'aspect-ratio vient du container. */
+}
+
+/* le player remplit #video en position ABSOLUE (inset:0), comme le media-poster qui, lui, s'affiche
+   correctement sur Safari. La chaîne height:100% seule décale la vidéo vers le bas sur Safari
+   (résolution du %height contre une hauteur issue d'aspect-ratio) ; l'absolu contourne ce bug. */
+.v10-player video-player,
+.v10-player video-skin,
+.v10-player hlsjs-video,
+.v10-player vimeo-video {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* vidéo native (players sound-design) : remplit son container en préservant le ratio (object-fit) */
+.v10-player video-skin > video,
+.v10-player video-player > video {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* miniature animée : couvre le player, se masque à la lecture (v10 gère [data-visible]) */
+.v10-player media-poster {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: block;
+}
+
+.v10-player media-poster:not([data-visible]) {
+    display: none;
+}
+
+.v10-player media-poster video,
+.v10-player media-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+    /* poster (img statique des héros, ou vidéo animée du showreel) : remplit le player.
+       v10 rend le poster via le CONTENU de <media-poster> (enfant), pas l'attribut src. */
+}
+
+/* pas de highlight tap ni d'outline blanc du player (le contour reste celui de #video) */
+.v10-player,
+.v10-player video-player,
+.v10-player video-skin,
+.v10-player hlsjs-video {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.v10-player :focus:not(#zz),
+.v10-player :focus-visible:not(#zz) {
+    outline: 0 !important;
+}
+
+/* bouton play central (tactile) : affordance avant la 1re lecture, style de la pastille native v10 */
+.v10-player .play-badge {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    padding: 0;
+    z-index: 4;
+    cursor: pointer;
+    background: rgba(0, 0, 0, .25);
+    -webkit-backdrop-filter: blur(16px) saturate(1.5);
+    backdrop-filter: blur(16px) saturate(1.5);
+    border: none;
+    color: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.v10-player .play-badge svg {
+    margin-left: 3px;
+    /* recentrage optique du triangle */
+}
+
+@media (hover: none) {
+    .v10-player:not(.started) .play-badge {
+        display: flex;
+    }
+}
+
+/* [TEMPORAIRE, en test] afficher le showreel en mobile (normalement masqué via .desk). À retirer après validation. */
+@media (max-width: 740px) {
+    #header {
+        flex-wrap: wrap;
+        /* laisse le reel passer SOUS le profil (sinon écrasé à côté en flex nowrap) */
+    }
+
+    #reel.desk {
+        display: block;
+        width: 100%;
+        margin: 6vw 0 2vw;
+    }
 }
 
 #profil {
@@ -1787,7 +1916,8 @@ media-tooltip-content {
 
     #video {
         object-fit: cover;
-        height: -webkit-fill-available;
+        height: auto;
+        /* aspect-ratio 16/9 (base) gouverne la hauteur ; -webkit-fill-available retiré (cassait le ratio du player v10) */
     }
 
     #description h3 br {
@@ -6506,5 +6636,1098 @@ media-player.is-loading :where(.vds-poster) {
 @keyframes reelspin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+
+/* ===================== ADS COLLECTION (ads.html) ===================== */
+
+/* Landing pleine largeur : le <body> est en display:table-row-group (width ignoré,
+   il se réduit à son contenu) et le <html> garde un fond sombre → sans largeur
+   forcée sur #main, ce fond déborde à droite. On force aussi la couleur de texte
+   (le body n'en définit aucune → noir par défaut, invisible en dark mode). */
+[data-barba-namespace="ads"] {
+    width: 100vw;
+    color: var(--content);
+}
+
+/* Fond : sur la page ads, on remplace la grille de lignes (.bggrid globale) par
+   une grille de POINTS hexagonale, masquée en diagonale : ~invisible en haut/bas
+   (header / footer), pic au milieu (derrière les créas). Scopé au namespace ads
+   (la règle globale .bggrid reste inchangée sur les autres pages). Theme-aware. */
+[data-barba-namespace="ads"] .bggrid {
+    /* Maille hexagonale : 2 couches de points, la 2e décalée d'un demi-pas
+       (14px, 24.25px) sur une tuile 28×48.5 → réseau triangulaire (plus proche
+       voisin ≈ 28px). */
+    background:
+        radial-gradient(circle, var(--content) 1.1px, transparent 1.6px) 0 0 / 28px 48.5px,
+        radial-gradient(circle, var(--content) 1.1px, transparent 1.6px) 14px 24.25px / 28px 48.5px;
+    /* Masque : bas dans le header (0→5%), pic au milieu (20%) sur les créas,
+       puis redescend (5%) et nul au footer. */
+    -webkit-mask-image: linear-gradient(165deg, transparent 0%, rgba(0, 0, 0, 0.03) 25%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.03) 75%, transparent 100%);
+    mask-image: linear-gradient(165deg, transparent 0%, rgba(0, 0, 0, 0.03) 25%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.03) 75%, transparent 100%);
+}
+
+/* Caractéristiques typo reprises de l'index (letter-spacing, line-height,
+   antialiasing, kerning), héritées par tout le texte des sections. */
+#adshero,
+#adscollection,
+#adsmanifeste,
+#adsoutro,
+#adsmodal {
+    letter-spacing: -1px;
+    line-height: 1.25;
+    font-kerning: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.adshero-title,
+.adshero-sub,
+.adslink,
+.cta-trigger,
+.cta-menu h4,
+.adsbrand,
+.adsbrands-meta,
+.adsmanifeste-lead,
+.adsmanifeste-strong,
+.adsmanifeste-text,
+.adsstat h1,
+.adsstat h3,
+.adsoutro-intro,
+.adsmodal-brandname,
+.adsmodal-meta p,
+.adtag {
+    transition: color 0.4s ease, background-color 0.4s ease, border-color 0.4s ease;
+}
+
+/* Texte atténué : 50% du contenu (n'affecte pas les images enfants) */
+.adsdim {
+    color: color-mix(in srgb, var(--content) 50%, transparent);
+}
+
+/* Un lien <a> reçoit color via a:link (spécificité 0,1,1 > .adsdim) : on remonte
+   la spécificité pour pouvoir l'atténuer quand même. */
+.adslink.adsdim {
+    color: color-mix(in srgb, var(--content) 50%, transparent);
+}
+
+/* ----- Card générique (galerie + ads flottantes) ----- */
+.adcard {
+    position: relative;
+    display: block;
+    padding: 0;
+    width: 100%;
+    aspect-ratio: 9 / 16;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--box);
+    cursor: pointer;
+    font-family: Inter;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.4s ease;
+}
+
+.adcard:hover {
+    border-color: var(--borderhover);
+}
+
+.adcard-poster {
+    position: absolute;
+    inset: 0;
+    background: var(--box);
+    background-size: cover;
+    background-position: center;
+}
+
+/* Preview animée (data-type="video") + image statique : remplissent la card,
+   clippées au radius 14px par .adcard (overflow:hidden). */
+.adcard-video,
+.adcard-poster img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    z-index: 1;
+}
+
+/* Effet lumière qui suit la souris (sans sur-élévation) */
+.adcard::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.16), transparent 45%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.adcard:hover::after {
+    opacity: 1;
+}
+
+/* ----- Hero ----- */
+#adshero {
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4vh 10vw;
+}
+
+.adshero-inner {
+    position: relative;
+    z-index: 3;
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    text-align: center;
+}
+
+.adshero-title {
+    font-size: 1.5rem;
+    font-weight: 400;
+    max-width: none;
+}
+
+.adshero-sub {
+    font-size: 1.125rem;
+    font-weight: 400;
+    max-width: 440px;
+}
+
+.adshero-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+}
+
+.adslink {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 1.125rem;
+    letter-spacing: -1px;
+    cursor: pointer;
+}
+
+.adslink svg {
+    height: 11px;
+    width: auto;
+    fill: currentColor;
+}
+
+/* Underline animé au survol (même mécanique que nav h3) */
+.adslink,
+.cta-trigger {
+    position: relative;
+    overflow: hidden;
+}
+
+.adslink::before,
+.adslink::after,
+.cta-trigger::before,
+.cta-trigger::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transition: all 750ms ease;
+}
+
+.adslink::before,
+.cta-trigger::before {
+    transform: translateX(-200%);
+}
+
+.adslink:hover::before,
+.cta-trigger:hover::before {
+    transform: translateX(0%);
+}
+
+.adslink:hover::after,
+.cta-trigger:hover::after {
+    transform: translateX(200%);
+}
+
+/* Ads flottantes du hero */
+.adsfloat {
+    position: absolute;
+    z-index: 1;
+    width: 150px;
+    opacity: 0.92;
+}
+
+.adsfloat--tl {
+    top: 6vh;
+    left: 15vw;
+}
+
+.adsfloat--tr {
+    top: 3vh;
+    right: 15vw;
+}
+
+.adsfloat--bl {
+    top: 40vh;
+    left: 9vw;
+}
+
+.adsfloat--br {
+    top: 44vh;
+    right: 9vw;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .adsfloat {
+        animation: adswiggle 15s ease-in-out infinite;
+    }
+
+    .adsfloat--tr {
+        animation-delay: -3.5s;
+    }
+
+    .adsfloat--bl {
+        animation-delay: -7.5s;
+    }
+
+    .adsfloat--br {
+        animation-delay: -11s;
+    }
+}
+
+@keyframes adswiggle {
+    0%, 100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    25% {
+        transform: translate(0, -12px) rotate(-1.2deg);
+    }
+    50% {
+        transform: translate(0, 7px) rotate(1deg);
+    }
+    75% {
+        transform: translate(0, -6px) rotate(0.6deg);
+    }
+}
+
+/* Sous-menu CTA de contact */
+.cta {
+    position: relative;
+}
+
+.cta-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: Inter;
+    font-size: 1.125rem;
+    letter-spacing: -1px;
+    color: var(--content);
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.cta-trigger svg {
+    height: 11px;
+    width: auto;
+    fill: currentColor;
+}
+
+.cta-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    min-width: 170px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 16px;
+    background: var(--box);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+    z-index: 20;
+}
+
+.cta.open .cta-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(10px);
+}
+
+.cta-menu a {
+    padding: 6px 2px;
+}
+
+.cta-menu h4 {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+/* Strip marques */
+.adsbrands {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.adsbrands-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    /* espacement vertical entre les deux lignes */
+}
+
+.adsbrands-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 26px;
+}
+
+.adsbrand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 1rem;
+}
+
+.adsbrand-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--content);
+    opacity: 0.5;
+    flex: none;
+}
+
+.adsbrands-meta {
+    font-size: 1rem;
+}
+
+/* ----- Galerie ----- */
+#adscollection {
+    padding: 6vh 5vw;
+}
+
+.adsgrid {
+    display: grid;
+    grid-template-columns: repeat(5, 150px);
+    justify-content: center;
+    gap: 1vw;
+}
+
+.adcard.is-hidden {
+    display: none;
+}
+
+.adsmore-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 3.5vh;
+}
+
+.adsmore {
+    font-size: 1.125rem;
+}
+
+.adsmore.is-done {
+    display: none;
+}
+
+/* ----- Manifeste ----- */
+#adsmanifeste {
+    padding: 8vh 17.5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+}
+
+.adsmanifeste-lead {
+    font-size: 1.125rem;
+    font-weight: 400;
+    max-width: 540px;
+}
+
+.adsmanifeste-strong {
+    font-size: 1.125rem;
+    font-weight: 400;
+    margin-top: 32px;
+}
+
+.adsmanifeste-text {
+    font-size: 1.125rem;
+    font-weight: 400;
+    max-width: 540px;
+}
+
+.adsstats {
+    display: flex;
+    justify-content: center;
+    gap: 6vw;
+    margin-top: 5vh;
+}
+
+.adsstat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.adsstat h1 {
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+.adsstat h3 {
+    font-size: 1.125rem;
+    font-weight: 400;
+}
+
+/* ----- Outro ----- */
+#adsoutro {
+    padding: 10vh 17.5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    text-align: center;
+}
+
+.adsoutro-intro {
+    font-size: 1.5rem;
+    font-weight: 400;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Photo + « Basile, » forment un bloc insécable : la coupure de ligne
+   ne se fait jamais entre la photo et le prénom (avant la photo ou après). */
+.adsoutro-nobreak {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.adsoutro-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+.adsoutro-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+}
+
+/* ----- Modale preview ----- */
+#adsmodal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4vh 4vw;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+#adsmodal.open {
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Modale instantanée ; seul le fond (overlay + flou) apparaît progressivement. */
+.adsmodal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--overlayon);
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    transition: opacity 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+#adsmodal.open .adsmodal-backdrop {
+    opacity: 1;
+    backdrop-filter: blur(6px);
+}
+
+/* --overlayon reste noir dans les deux thèmes : en light mode (.dark-mode sur body)
+   on éclaircit l'overlay au lieu de l'assombrir. */
+.dark-mode .adsmodal-backdrop {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.adsmodal-card {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 360px) 1fr;
+    width: 50vw;
+    max-height: 86vh;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--box);
+}
+
+.adsmodal-creative {
+    position: relative;
+    aspect-ratio: 9 / 16;
+    max-height: 86vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--box);
+}
+
+.adsmodal-creative img,
+.adsmodal-creative video,
+.adsmodal-creative media-player {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Player vidéo (v10 HLS) : épouse la créa comme l'image. Pas d'arrondi propre,
+   c'est .adsmodal-card (desktop 20px) / le plein écran (mobile) qui clippe. */
+.adsmodal-creative.v10-player {
+    border-radius: 0;
+}
+
+/* Badge play du player v10 : par défaut z-index 4, ce qui le faisait passer
+   AU-DESSUS du panneau d'infos et du ✕ dans la modale plein écran (le stacking
+   context est #adsmodal, où .adsmodal-info et .adsmodal-close valent 0 et 3).
+   Ici on le remet à 0 : il reste au-dessus de la vidéo (même contexte, mais il
+   est ajouté après <video-player> dans le DOM) et repasse SOUS le panneau.
+   Ne concerne que la modale ads : les players des autres pages gardent leur 4. */
+#adsmodal .v10-player .play-badge {
+    z-index: 0;
+}
+
+/* Couche de fondu entre deux créas : image figée de la créa sortante, posée
+   PAR-DESSUS la nouvelle (déjà opaque dessous) puis dissoute en JS via Web
+   Animations. Durée et activation : ADS_CROSSFADE_MS dans script.js.
+   Hérite width/height/object-fit de la règle .adsmodal-creative img ci-dessus. */
+.adsmodal-fade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.adsmodal-info {
+    position: relative;
+    padding: 56px 56px 44px;
+    display: flex;
+    flex-direction: column;
+}
+
+.adsmodal-close {
+    position: absolute;
+    top: 26px;
+    right: 32px;
+    padding: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 0;
+    color: var(--content);
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.adsmodal-close:hover {
+    opacity: 1;
+}
+
+.adsmodal-close svg {
+    height: 18px;
+    width: 18px;
+}
+
+.adsmodal-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.adsmodal-brand-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--content);
+    opacity: 0.4;
+    flex: none;
+}
+
+.adsmodal-brandname {
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.adsmodal-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.adsmodal-meta p {
+    font-size: 1rem;
+}
+
+.adsmodal-k {
+    color: color-mix(in srgb, var(--content) 50%, transparent);
+}
+
+.adsmodal-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.adtag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 26px;
+    background-color: var(--containersolid);
+    border: 1px solid var(--borderhover);
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.adsmodal-nav {
+    position: absolute;
+    right: 40px;
+    bottom: 40px;
+    display: flex;
+    gap: 22px;
+}
+
+.adsmodal-nav button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    line-height: 0;
+    color: var(--content);
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.adsmodal-nav button:hover {
+    opacity: 1;
+}
+
+.adsmodal-nav svg {
+    height: 20px;
+    width: 22px;
+}
+
+/* Éléments propres à la modale mobile (poignée, séparateur, carrousel) :
+   neutralisés en desktop. Le wrapper repliable devient transparent
+   (display:contents) → flux desktop inchangé : close, brand, meta, tags, nav. */
+.adsmodal-handle,
+.adsmodal-divider,
+.adsmodal-thumbs {
+    display: none;
+}
+
+.adsmodal-details,
+.adsmodal-details-inner {
+    display: contents;
+}
+
+/* Plein écran mobile : on masque la nav flottante pour éviter la double nav */
+body.ads-modal-open #floatnav {
+    display: none;
+}
+
+/* ----- Responsive ----- */
+@media screen and (max-width: 1280px) {
+    #adshero, #adscollection {
+        padding-left: 5vw;
+        padding-right: 5vw;
+    }
+
+    #adsmanifeste, #adsoutro {
+        padding-left: 10vw;
+        padding-right: 10vw;
+    }
+
+    .adsgrid {
+        grid-template-columns: repeat(3, 150px);
+    }
+
+    .adsmodal-card {
+        width: 80vw;
+    }
+
+    .adsfloat--bl, .adsfloat--br {
+        display: none;
+    }
+
+    .adsfloat--tl {
+        left: 3vw;
+    }
+
+    .adsfloat--tr {
+        right: 3vw;
+    }
+}
+
+@media screen and (max-width: 740px) {
+    #adshero {
+        min-height: auto;
+        padding: 16vh 5vw 10vh;
+    }
+
+    #adscollection {
+        padding: 5vh 5vw;
+    }
+
+    #adsmanifeste, #adsoutro {
+        padding-left: 5vw;
+        padding-right: 5vw;
+    }
+
+    .adsgrid {
+        grid-template-columns: repeat(2, 150px);
+        gap: 4vw;
+    }
+
+    .adsfloat {
+        display: none;
+    }
+
+    .adsstats {
+        flex-direction: column;
+        gap: 4vh;
+        margin-top: 5vh;
+    }
+
+    /* ===== Modale mobile : viewer plein écran (bottom-sheet + carrousel) =====
+       Reconstruit depuis Figma (frames 402x874). Palette sombre fixe
+       (texte blanc, surfaces #121212) : convention viewer plein écran. */
+    #adsmodal {
+        padding: 0;
+    }
+
+    /* Plein écran : on coupe le scroll (et la scrollbar) de la page derrière.
+       Classe posée aussi sur <html> par le JS (plus fiable qu'un :has()). */
+    html.ads-modal-open,
+    body.ads-modal-open {
+        overflow: hidden;
+    }
+
+    /* La scrollbar custom (OverlayScrollbars, initialisée sur body, autoHide:never)
+       est un overlay DOM à part : on la masque explicitement en plein écran. */
+    body.ads-modal-open .os-scrollbar {
+        display: none !important;
+    }
+
+    .adsmodal-card {
+        position: relative;
+        display: block;
+        width: 100vw;
+        height: 100dvh;
+        max-height: none;
+        border: 0;
+        border-radius: 0;
+        overflow: hidden;
+        background: var(--background);
+    }
+
+    /* Pas de voile en haut : la créa monte jusqu'au bord de l'écran, l'heure et
+       la batterie se posent directement dessus (choix utilisateur du 2026-07-30,
+       le dégradé était jugé visible). Si la lisibilité de la barre de statut
+       repose un jour problème, c'est ici qu'un voile reviendrait. */
+
+    /* Créa CENTRÉE SUR LA ZONE VISIBLE, c'est-à-dire la portion d'écran au-dessus
+       du panneau REPLIÉ, pas sur tout le viewport. La boîte mesure 100vw × 100dvh
+       et son centre est aligné sur le centre de cette zone, donc elle remonte de
+       la moitié de la hauteur du panneau : elle dépasse en haut (rognée) et
+       s'arrête un peu avant le bas de l'écran. Ce manque en bas est SOUS le
+       panneau, qui est opaque en pied et floute le reste : invisible, et assumé
+       par l'utilisateur.
+       object-fit:cover centre le média dans la boîte (cf. règle
+       .adsmodal-creative img,video,media-player) → le centre optique de la créa
+       tombe donc bien au centre de la zone visible.
+       --ads-sheet-h = hauteur du panneau REPLIÉ, mesurée en JS
+       (adsSyncSheetHeight) : constante même panneau déployé, donc la créa ne
+       bouge pas quand les détails se dévoilent, le panneau la recouvre juste
+       davantage. Ne pas remplacer par la hauteur courante du panneau. */
+    .adsmodal-creative {
+        position: absolute;
+        left: 0;
+        top: calc((100dvh - var(--ads-sheet-h, 115px)) / 2);
+        transform: translateY(-50%);
+        width: 100vw;
+        height: 100dvh;
+        aspect-ratio: auto;
+        max-height: none;
+        background: transparent;
+    }
+
+    /* Panneau bas : surface givrée (--containersolid @75%) + flou + gradient
+       vers le fond du site (--background) qui fond la créa. Theme-aware. */
+    .adsmodal-info {
+        position: absolute;
+        inset: auto 0 0 0;
+        display: flex;
+        flex-direction: column;
+        padding: 13px 54px max(env(safe-area-inset-bottom, 0px), 8px);
+        color: var(--content);
+        border-radius: 35px 35px 0 0;
+        background:
+            linear-gradient(to top, var(--background), transparent),
+            color-mix(in srgb, var(--containersolid) 75%, transparent);
+        /* Figma background-blur 75 ; valeur CSS à caler visuellement */
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+        transition: transform 0.3s cubic-bezier(0.67, 0.01, 0.27, 1);
+    }
+
+    /* Prolonge le panneau SOUS le bord bas de l'écran. Sans ça, le rebond du
+       glissé vers le haut (jusqu'à 28px) soulevait le panneau et découvrait son
+       bord bas, laissant réapparaître la créa dessous.
+       Volontairement un pseudo-élément et pas du padding : la boîte du panneau,
+       sa hauteur mesurée (--ads-sheet-h) et la répartition de son dégradé de fond
+       restent intactes, donc AUCUN contenu ne bouge. 200px = très large devant
+       les 28px de rebond, marge pour un rebond plus ample plus tard. */
+    .adsmodal-info::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 200px;
+        background: var(--background);
+        pointer-events: none;
+    }
+
+    /* ✕ rond flouté, ancré en haut-droite de la modale (enfant direct de la carte).
+       Position pilotée par --ads-close-top (posée en JS sur les iPhone à encoche,
+       cf. adsSetSafeMin) : le ✕ est à droite, donc jamais sous la dynamic island,
+       seulement sous l'heure/batterie → il peut remonter bien plus haut que la
+       safe-area complète. Repli hors iPhone à encoche : env() + 15px (soit 15px
+       en desktop, inchangé). Un seul nombre à toucher pour l'ajuster. */
+    .adsmodal-close {
+        position: absolute;
+        top: var(--ads-close-top, calc(env(safe-area-inset-top, 0px) + 15px));
+        right: 15px;
+        z-index: 3;
+        width: 37px;
+        height: 37px;
+        padding: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        color: var(--content);
+        background: linear-gradient(to bottom, color-mix(in srgb, var(--containersolid) 75%, transparent), color-mix(in srgb, var(--containersolid) 50%, transparent));
+        backdrop-filter: blur(30px);
+        -webkit-backdrop-filter: blur(30px);
+    }
+
+    /* Croix : X visible ~10px (centre du viewBox 24u → svg 20px), trait ~2px
+       (stroke-width 2.4 en unités × 20/24). Override mobile uniquement :
+       le desktop garde son SVG (18px, trait fin). */
+    .adsmodal-close svg {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2.4;
+    }
+
+    .adsmodal-handle {
+        display: block;
+        width: 50px;
+        height: 2px;
+        border-radius: 2px;
+        background: color-mix(in srgb, var(--content) 40%, transparent);
+        margin: 0 auto 14px;
+    }
+
+    .adsmodal-brand {
+        justify-content: center;
+        gap: 8px;
+        margin: 0;
+    }
+
+    .adsmodal-brand-dot {
+        width: 26px;
+        height: 26px;
+    }
+
+    .adsmodal-brandname {
+        color: var(--content);
+    }
+
+    /* Séparateur : plus large que le contenu (marges ~29px via -25px) */
+    .adsmodal-divider {
+        display: block;
+        height: 1px;
+        background: color-mix(in srgb, var(--content) 22%, transparent);
+        margin: 16px -25px 20px;
+    }
+
+    /* Repli / déploiement : la hauteur (px) est posée par le JS (p × hauteur du
+       contenu) et animée par transition CSS → lissage au relâcher ET transition
+       de taille au changement de créa (contenu de hauteur différente).
+       Pendant le glissé, .is-dragging coupe la transition (suivi du doigt).
+       Le masque dégradé (piloté par --sheet) adoucit le bord de révélation :
+       zone de fondu = 42px × (1 − --sheet) → nulle une fois le panneau ouvert. */
+    .adsmodal-details {
+        display: block;
+        overflow: hidden;
+        height: 0;
+        transition: height 0.38s cubic-bezier(0.67, 0.01, 0.27, 1);
+        -webkit-mask-image: linear-gradient(to top, transparent 0, #000 calc(42px * (1 - var(--sheet, 0))));
+        mask-image: linear-gradient(to top, transparent 0, #000 calc(42px * (1 - var(--sheet, 0))));
+    }
+
+    .adsmodal-details-inner {
+        display: block;
+        padding-top: 20px;
+    }
+
+    .adsmodal-info.is-dragging,
+    .adsmodal-info.is-dragging .adsmodal-details {
+        transition: none;
+    }
+
+    /* Fluidité du glissé : le masque dégradé dépend de --sheet, qui change à
+       CHAQUE frame pendant le geste → recalcul du masque et donc repaint complet
+       du panneau, arrière-plan flouté (backdrop-filter: blur(30px)) compris. On
+       le neutralise le temps du glissé : la seule différence visible est un bord
+       de révélation net au lieu d'adouci pendant qu'on tient le panneau, et le
+       masque revient au relâcher, quand la transition CSS reprend la main.
+       Pour annuler : supprimer ce bloc. */
+    .adsmodal-info.is-dragging .adsmodal-details {
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+
+    /* Bloc inerte par défaut (ADS_PANEL_PERF = false, cf. script.js) : la classe
+       .ads-perf n'est plus posée. Conservé pour pouvoir retenter la piste, mais
+       le glissé a été rapporté saccadé pendant qu'elle était active. */
+    #adsmodal.ads-perf .adsmodal-details {
+        contain: layout paint;
+    }
+
+    #adsmodal.ads-perf .adsmodal-info.is-dragging {
+        will-change: transform;
+    }
+
+    .adsmodal-meta {
+        gap: 14px;
+    }
+
+    .adsmodal-tags {
+        margin-top: 16px;
+    }
+
+    /* .adsmodal-k et .adtag : pas d'override ici → on hérite des règles desktop
+       (déjà theme-aware : clé = color-mix(--content 50%), tag = --containersolid
+       / --borderhover), donc l'ensemble bascule en light mode automatiquement. */
+
+    /* Flèches remplacées par le carrousel en mobile */
+    .adsmodal-nav {
+        display: none;
+    }
+
+    /* Carrousel horizontal, pleine largeur (full-bleed via marges négatives),
+       verrouillé au centre : la vignette centrale = la créa active.
+       Le padding latéral = 50vw - demi-vignette pour centrer n'importe quelle vignette. */
+    .adsmodal-thumbs {
+        display: flex;
+        align-items: flex-end;
+        gap: 5px;
+        min-height: 64px;
+        margin: 14px -54px 0;
+        padding: 0;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        /* none : le scroll est piloté en JS (Pointer Events + setPointerCapture),
+           pour contourner le blocage iOS du scroll tactile natif par le listener
+           non-passif du bottom-sheet. Pas de scroll-snap : il entrait en conflit
+           avec le drag manuel (saccades). */
+        touch-action: none;
+    }
+
+    .adsmodal-thumbs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .adsthumb {
+        flex: 0 0 auto;
+        width: 32px;
+        aspect-ratio: 9 / 16;
+        border-radius: 4px;
+        overflow: hidden;
+        padding: 0;
+        border: 0;
+        cursor: pointer;
+        opacity: 0.5;
+        background: var(--box);
+        transform-origin: center bottom;
+        transition: opacity 0.3s ease, transform 0.25s cubic-bezier(0.67, 0.01, 0.27, 1);
+    }
+
+    .adsthumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Active : agrandie par TRANSFORM (32 → 36px, soit 1.125), pas par width.
+       Crucial : un changement de width relance le layout et décale toutes les
+       vignettes suivantes de 4px APRÈS que le snap a calculé sa cible → la
+       vignette active ne tombait jamais pile au centre. Avec un scale, aucune
+       position ne bouge et le centrage est exact. Origine en bas pour rester
+       alignée sur la ligne du carrousel (align-items:flex-end). */
+    .adsthumb.active {
+        opacity: 1;
+        transform: scale(1.125);
     }
 }

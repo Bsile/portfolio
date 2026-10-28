@@ -3,3 +3,14 @@ node_modules/
 
 # Doc interne, ne pas déployer
 CLAUDE.md
+
+# Sources brutes des créas ads (lourdes, > 100 Mo GitHub) — à convertir vers assets/
+_ads/
+
+# Dossier de test isolé (POC Video.js) — non déployé, jetable
+_videojs-test/
+
+# masters sources pour encodage HLS (ne pas committer, seul le HLS va au repo)
+_migration/*.mp4
+_migration/*.mov
+_migration/*.webm
